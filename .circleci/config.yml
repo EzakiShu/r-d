@@ -38,7 +38,7 @@ jobs:
           command: echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USER --password-stdin
       - run:
           name: Build Image
-          command: docker build -f gin/Dockerfile . --tag $DOCKERHUB_REPO:python$CIRCLE_BUILD_NUM --no-cache
+          command: docker build -f Dockerfile . --tag $DOCKERHUB_REPO:python$CIRCLE_BUILD_NUM --no-cache
       - run:
           name: Push Image
           command: docker push $DOCKERHUB_REPO:python$CIRCLE_BUILD_NUM
@@ -53,7 +53,7 @@ jobs:
           name: Setting Github Config
           command: |
             git config --global user.name  "EzakiShu"
-            git config --global user.email "yoichi.nagamoto@gmail.com"
+            git config --global user.email "ezashu0227@gmail.com"
       - add_ssh_keys:
           fingerprints:
             - "<fingerprints>"
