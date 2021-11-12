@@ -13,10 +13,10 @@ workflows:
           context: dockerhub
           requires:
             - build
-          filters:
-            branches:
-              only:
-                main
+          #filters:
+          #  branches:
+          #    only:
+          #      main
 
 references:
   docker_hub_authentication: &docker_hub_authentication
@@ -53,7 +53,7 @@ jobs:
           name: Setting Github Config
           command: |
             git config --global user.name  "EzakiShu"
-            git config --global user.email "yoichi.nagamoto@gmail.com"
+            git config --global user.email "ezashu0227@gmail.com"
       - add_ssh_keys:
           fingerprints:
             - "<fingerprints>"
