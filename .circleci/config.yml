@@ -13,10 +13,10 @@ workflows:
           context: dockerhub
           requires:
             - build
-          #filters:
-          #  branches:
-          #    only:
-          #      main
+          filters:
+            branches:
+              only:
+                main
 
 references:
   docker_hub_authentication: &docker_hub_authentication
