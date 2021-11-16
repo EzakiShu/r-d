@@ -41,7 +41,7 @@ jobs:
           command: docker build -f entry/Dockerfile . --tag $DOCKERHUB_REPO:python_entry$CIRCLE_BUILD_NUM --no-cache
       - run:
           name: Push Image
-          command: docker push $DOCKERHUB_REPO:python$CIRCLE_BUILD_NUM
+          command: docker push $DOCKERHUB_REPO:python_entry$CIRCLE_BUILD_NUM
 
   update:
     docker:
