@@ -5,7 +5,7 @@ WORKDIR r-d/people_detection
 RUn apt update
 RUN python -m pip install --upgrade pip
 RUN pip install Flask
-RUN pip install h5py
+RUN pip install h5py==2.10.0
 RUN pip install opencv-python
 RUN pip install tensorflow==1.13.1
 RUN pip install keras==2.2.4
