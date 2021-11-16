@@ -8,7 +8,7 @@ RUN pip install Flask
 RUN pip install opencv-python
 RUN pip install numpy
 RUN pip install requests
-RUN pip install PIL
+RUN pip install pillow
 RUN apt install -y libgl1-mesa-dev
 ENTRYPOINT python upload.py
 
