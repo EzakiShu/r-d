@@ -6,5 +6,6 @@ RUN python -m pip install --upgrade pip
 RUN pip install Flask
 RUN pip install opencv-python
 RUN pip install numpy
+RUN pip install requests
 ENTRYPOINT python upload.py
 
