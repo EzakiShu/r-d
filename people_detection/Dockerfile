@@ -11,7 +11,7 @@ RUN pip install keras==2.2.2
 RUN pip install numpy
 RUN pip install scipy
 RUN pip install pillow
-RUN wget git clone https://github.com/qqwweee/keras-yolo3
+RUN git clone https://github.com/qqwweee/keras-yolo3
 WORKDIR /keras-yolo3
 RUN python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 ENTRYPOINT python people_detection.py
