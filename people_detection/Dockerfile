@@ -11,7 +11,8 @@ RUN pip install keras==2.2.4
 RUN pip install numpy==1.16.1
 RUN pip install scipy
 RUN pip install pillow
-RUN pip install matplotlib 
+RUN pip install matplotlib
+RUN apt-get install -y libgl1-mesa-dev 
 RUN git clone https://github.com/qqwweee/keras-yolo3
 WORKDIR keras-yolo3
 RUN wget https://pjreddie.com/media/files/yolov3.weights
