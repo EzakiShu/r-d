@@ -13,5 +13,6 @@ RUN pip install scipy
 RUN pip install pillow
 RUN git clone https://github.com/qqwweee/keras-yolo3
 WORKDIR keras-yolo3
+RUN wget https://pjreddie.com/media/files/yolov3.weights
 RUN python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 ENTRYPOINT python people_detection.py
