@@ -48,8 +48,8 @@ def predict():
         }
         return jsonify(img_data)
 
-@app.route('/hello')
-def Hello():
+@app.route('/')
+def hello():
     return "Connect"
 
 model = None
