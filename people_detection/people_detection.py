@@ -47,7 +47,11 @@ def predict():
             "data":img_b
         }
         return jsonify(img_data)
-        
+
+@app.route('/hello', methods=["POST"])
+def Hello():
+    return "Connect"
+
 model = None
 if __name__ == "__main__":
 
