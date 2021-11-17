@@ -22,7 +22,7 @@ def uploads_file():
     img_b = i2b(img)
 
     #画像の送信
-    url = "http://172.21.34.232:8081/api/predict"
+    url = "http://python-detection1:80/api/predict"
     img_data = {
         "data":img_b
     }

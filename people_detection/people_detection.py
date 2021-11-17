@@ -22,6 +22,10 @@ def detect_img(yolo, image):
 
 FLAGS = None
 
+@app.route('/')
+def hello():
+    return "Connect"
+
 # /api/predict にPOSTリクエストされたら予測値を返す関数
 @app.route('/api/predict', methods=["POST"])
 def predict():
@@ -47,7 +51,7 @@ def predict():
             "data":img_b
         }
         return jsonify(img_data)
-        
+
 model = None
 if __name__ == "__main__":
 
