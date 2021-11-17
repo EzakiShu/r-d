@@ -48,7 +48,7 @@ def predict():
         }
         return jsonify(img_data)
 
-@app.route('/hello', methods=["POST"])
+@app.route('/hello')
 def Hello():
     return "Connect"
 
