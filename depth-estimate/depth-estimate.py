@@ -6,7 +6,6 @@ from converter import i2b, b2i
 from io import BytesIO
 import cv2
 import json
-import tensorflow as tf
 from test_split import load_model, est_image
 
 app     = Flask(__name__)
