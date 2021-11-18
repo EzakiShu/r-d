@@ -4,7 +4,7 @@ WORKDIR /app
 RUN apt update
 RUN apt install -y libgl1-mesa-dev
 RUN python -m pip install --upgrade pip
-RUN pip install Flask opencv-ptyhon numpy pillow matplotlib requests
+RUN pip install Flask opencv-python numpy pillow matplotlib requests
 RUN pip install torch
 RUN git clone https://github.com/nianticlabs/monodepth2.git
 RUN git clone https://github.com/EzakiShu/r-d.git
