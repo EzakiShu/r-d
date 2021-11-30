@@ -10,11 +10,12 @@ from converter import i2b, b2i
 from io import BytesIO
 import cv2
 import json
-import time
+import time 
 
 app = Flask(__name__)
 
 import tensorflow as tf
+
 graph = tf.get_default_graph()
 
 def detect_img(yolo, image):
