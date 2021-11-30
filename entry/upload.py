@@ -30,7 +30,7 @@ def uploads_file():
     #return jsonify(response.json())
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
     #time = response.json()['time']
-    return img, 10
+    return img, "10"
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=8080,threaded=True)
