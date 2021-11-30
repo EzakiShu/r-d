@@ -22,15 +22,15 @@ def uploads_file():
     img_b = i2b(img)
 
     #画像の送信
-    url = "http://python-detection3:8080/api/predict"
+    url = "http://python-detection1:8080/api/predict"
     img_data = {
         "data":img_b
     }
     response = requests.post(url,data=img_data)
     #return jsonify(response.json())
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
-    #time = response.json()['time']
-    return img
+    time = response.json()['time']
+    return img, time
 
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=8080,threaded=True)
