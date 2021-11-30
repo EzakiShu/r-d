@@ -10,6 +10,7 @@ from converter import i2b, b2i
 from io import BytesIO
 import cv2
 import json
+import time
 
 app = Flask(__name__)
 
@@ -29,6 +30,8 @@ def hello():
 # /api/predict にPOSTリクエストされたら予測値を返す関数
 @app.route('/api/predict', methods=["POST"])
 def predict():
+    #実行時間計測
+    start = time.time()
     global graph
     with graph.as_default():
         #POSTされたファイルをOpenCVに変換
@@ -46,9 +49,13 @@ def predict():
         #バイナリに変換
         img_b = i2b(cv_image)
 
-        #画像の返信
+        #実行時間の計算
+        end = time.time() - start
+
+        #画像と実行時間の返信
         img_data = {
             "data":img_b
+            "time":end
         }
         return jsonify(img_data)
 
