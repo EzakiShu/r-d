@@ -54,7 +54,7 @@ def predict():
 
         #画像と実行時間の返信
         img_data = {
-            "data":img_b
+            "data":img_b,
             "time":end
         }
         return jsonify(img_data)
