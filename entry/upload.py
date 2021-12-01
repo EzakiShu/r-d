@@ -27,11 +27,11 @@ def uploads_file():
         "data":img_b
     }
     response = requests.post(url,data=img_data)
-    
+    #print(response.json().keys())
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
-    time = response.json()['time']
-    print(response.json().keys())
-    return str(time)
-
+    #time = response.json()['time']
+    #return str(time)
+    return img 
+    
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=8080,threaded=True)
