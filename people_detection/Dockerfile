@@ -3,6 +3,7 @@ ARG BRANCH=main
 EXPOSE 5000
 RUN git clone https://github.com/EzakiShu/r-d.git
 WORKDIR r-d/people_detection
+RUN git checkout origin/$BRANCH
 RUn apt update
 RUN python -m pip install --upgrade pip
 RUN pip install Flask
@@ -16,8 +17,7 @@ RUN pip install pillow
 RUN pip install matplotlib
 RUN apt install -y libgl1-mesa-dev 
 RUN git clone https://github.com/qqwweee/keras-yolo3
-WORKDIR keras-yolo3
-RUN git checkout origin/$BRANCH
+WORKDIR keras-yolo
 RUN wget https://pjreddie.com/media/files/yolov3.weights
 RUN python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 RUN cp ../converter.py ../people_detection.py ../yolo.py ./
