@@ -30,7 +30,7 @@ def uploads_file():
     
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
     time = response.json()['time']
-    #print(time)
+    print(response.json().keys())
     return str(time)
 
 if __name__ == "__main__":
