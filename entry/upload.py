@@ -29,7 +29,8 @@ def uploads_file():
     response = requests.post(url,data=img_data)
     
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
-    time = response.json()['time']
+    #time = response.json()['time']
+    #print(time)
     return img
 
 if __name__ == "__main__":
