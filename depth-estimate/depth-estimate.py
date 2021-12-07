@@ -52,10 +52,10 @@ def estimate():
   # make pipe and make process
   read_pipe, write_pipe = Pipe()
   process = Process(target=estimateFunc, args=(write_pipe, image,))
-  write_pipe.close()
   process.start()
   res_image = read_pipe.recv()
   read_pipe.close()
+  write_pipe.close()
   process.join()
   return render_template('upload.html', image=res_image)
 
