@@ -24,7 +24,7 @@ def uploads_file():
     img_b = i2b(img)
 
     # 時間を取得
-    url = "http://time_data:10000/get-time"
+    url = "http://time-data:10000/get-time"
     time_data = requests.post(url, data=0)
     time_data = {
         "detection1": float(time_data.json()["detection1"]),
