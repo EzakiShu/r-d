@@ -71,7 +71,7 @@ def predict():
         cursor = conn.cursor()
         #sql = ("UPDATE detection SET time=15 WHERE pod='detection1'")
         sql = "UPDATE detection SET time=" + \
-            str(end) + " WHERE pod='detection1'"
+            str(end) + " WHERE pod='detection2'"
         cursor.execute(sql)
         cursor.close()
         conn.commit()
