@@ -69,8 +69,8 @@ def predict():
         # 実行時間の計算
         end = time.time() - start
         cursor = conn.cursor()
-        #sql = ("UPDATE time SET detection1 =" + end)
-        # cursor.execute(sql)
+        sql = ("UPDATE detection SET detection1 =" + end)
+        cursor.execute(sql)
         cursor.close()
         conn.close()
 
