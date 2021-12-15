@@ -4,7 +4,7 @@ app = Flask(__name__)
 time_data = {"detection1": 0, "detection2": 0, "detection3": 0}
 
 
-@app.route("/ send-time-detection1", methods=["POST"])
+@app.route("/send-time-detection1", methods=["POST"])
 def time_detection1():
     global time_data
     time_data["detection1"] = request.form["time_detection1"]
