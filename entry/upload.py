@@ -41,7 +41,7 @@ def uploads_file():
     conn.close()
 
     # 画像の送信
-    url = "http://python-" + min_time_edge['pod'] + ":8080/api/predict"
+    url = "http://python-" + min_time_edge[0] + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
