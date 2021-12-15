@@ -9,9 +9,8 @@ from yolo import YOLO, detect_video
 from PIL import Image, ImageOps
 from converter import i2b, b2i
 from io import BytesIO
-import requests
-import json
 import time
+import mysql.connector
 
 app = Flask(__name__)
 
@@ -53,18 +52,27 @@ def predict():
         # バイナリに変換
         img_b = i2b(cv_image)
 
-        # 実行時間の計算
-        end = time.time() - start
-
-        # 画像と実行時間の返信
-        """  img_data = {
-            "data":img_b,
-            "time":end
-        }
-         """
+        # 画像の返信
         img_data = {
             "data": img_b
         }
+
+        # database接続
+        conn = mysql.connector.connect(
+            host='mysql-server',
+            port='3306',
+            user='devuser',
+            password='devuser',
+            database='time'
+        )
+
+        # 実行時間の計算
+        end = time.time() - start
+        cursor = conn.cursor()
+        sql = ("UPDATE time SET detection1 =" + end)
+        cursor.execute(sql)
+        cursor.close()
+        conn.close()
 
         return jsonify(img_data)
 
