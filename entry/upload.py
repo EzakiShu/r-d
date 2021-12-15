@@ -35,14 +35,13 @@ def uploads_file():
     cursor = conn.cursor()
     sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
-    min_time_edge = cursor.fetchall()
-    print(type(min_time_edge))
+    min_time_edge = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
     # 画像の送信
-    url = "http://python-" + min_time_edge + ":8080/api/predict"
+    url = "http://python-" + min_time_edge['pod'] + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
