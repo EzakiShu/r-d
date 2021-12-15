@@ -1,6 +1,7 @@
 import requests
 import cv2
 import numpy as np
+import mysql.connector
 from flask import Flask, request
 from flask import render_template
 from werkzeug.utils import secure_filename
@@ -23,17 +24,21 @@ def uploads_file():
     # バイナリに変換
     img_b = i2b(img)
 
-    # 時間を取得
-    url = "http://time-data:10000/get-time"
-    time_data = requests.post(url, data=0)
-    time_data = {
-        "detection1": float(time_data.json()["detection1"]),
-        "detection2": float(time_data.json()["detection2"]),
-        "detection3": float(time_data.json()["detection3"])
-    }
+    # database接続
+    conn = mysql.connector.connect(
+        host='mysql-server',
+        port='3306',
+        user='devuser',
+        password='devuser',
+        database='time'
+    )
+    cursor = conn.cursor()
+    sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
+    cursor.execute(sql)
+    min_time_edge = cursor.fetch()
 
-    # 直前の実行時間が最短なPod
-    min_time_edge = min(time_data.items(), key=lambda x: x[1])[0]
+    cursor.close()
+    conn.close()
 
     # 画像の送信
     url = "http://python-" + min_time_edge + ":8080/api/predict"

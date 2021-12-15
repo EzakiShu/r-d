@@ -16,6 +16,7 @@ RUN pip install scipy
 RUN pip install pillow
 RUN pip install matplotlib
 RUN apt install -y libgl1-mesa-dev 
+RUN pip install mysql-connector-python
 RUN git clone https://github.com/qqwweee/keras-yolo3
 WORKDIR keras-yolo3
 RUN wget https://pjreddie.com/media/files/yolov3.weights

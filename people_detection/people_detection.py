@@ -31,8 +31,6 @@ FLAGS = None
 def hello():
     return "Connect"
 
-# /api/predict にPOSTリクエストされたら予測値を返す関数
-
 
 @app.route('/api/predict', methods=["POST"])
 def predict():
@@ -67,14 +65,6 @@ def predict():
         img_data = {
             "data": img_b
         }
-
-        time_data = {
-            "time_detection1": end
-        }
-
-        # 実行時間の送信
-        url = "http://time-data:10000/send-time-detection1"
-        requests.post(url, data=time_data)
 
         return jsonify(img_data)
 
