@@ -52,30 +52,14 @@ def predict():
         # バイナリに変換
         img_b = i2b(cv_image)
 
-        # 画像の返信
-        img_data = {
-            "data": img_b
-        }
-
-        # database接続
-        conn = mysql.connector.connect(
-            host='mysql-server',
-            port='3306',
-            user='devuser',
-            password='devuser',
-            database='time'
-        )
-
         # 実行時間の計算
         end = time.time() - start
-        cursor = conn.cursor()
-        #sql = ("UPDATE detection SET time=15 WHERE pod='detection1'")
-        sql = "UPDATE detection SET time=" + \
-            str(end) + " WHERE pod='detection2'"
-        cursor.execute(sql)
-        cursor.close()
-        conn.commit()
-        conn.close()
+
+        # 画像と実行時間の返信
+        img_data = {
+            "data": img_b,
+            "time": end
+        }
 
         return jsonify(img_data)
 
