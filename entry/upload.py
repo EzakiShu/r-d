@@ -53,9 +53,12 @@ def uploads_file():
 
     # 転送時間計測
     end = time.time() - start
+    transfer_time = end - response.json()['time']
 
     sql = "UPDATE detection SET time=" + \
-        str(response.json()['time']) + " WHERE pod='" + min_time_edge[0] + "'"
+        str(response.json()['time']) + \
+        ",transfer=" + str(transfer_time) + " WHERE pod='" + \
+        min_time_edge[0] + "'"
     cursor.execute(sql)
     cursor.close()
     conn.commit()
