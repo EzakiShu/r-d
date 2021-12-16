@@ -1,11 +1,13 @@
 import requests
 import cv2
+import logging
 import numpy as np
 import mysql.connector
 from flask import Flask, request
 from flask import render_template
 from werkzeug.utils import secure_filename
 from converter import i2b, b2i
+import time
 
 app = Flask(__name__)
 
@@ -36,7 +38,6 @@ def uploads_file():
     sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
     min_time_edge = cursor.fetchone()
-    print(min_time_edge[0])
     cursor.close()
     conn.close()
 
@@ -45,7 +46,23 @@ def uploads_file():
     img_data = {
         "data": img_b
     }
+
+    # 転送時間計測
+    start = time.time()
+
+    # 検知リクエスト
     response = requests.post(url, data=img_data)
+
+    # 転送時間計測
+    end = time.time() - start
+
+    cursor = conn.cursor()
+    sql = "UPDATE detection SET time=" + \
+        str(response.json()['time']) + " WHERE pod='" + min_time_edge[0] + "'"
+    cursor.execute(sql)
+    cursor.close()
+    conn.commit()
+    conn.close()
 
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
     #time = response.json()['time']
