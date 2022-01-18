@@ -35,7 +35,7 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor()
-    sql = ("SELECT next FROM RR")
+    sql = ("SELECT next FROM RoundRobin")
     cursor.execute(sql)
     next_edge = cursor.fetchone()
 
