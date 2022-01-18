@@ -57,12 +57,12 @@ def uploads_file():
 
     # next pod
     if next_edge[0] == 1:
-        next = 2
+        next = "2 where next=1"
     elif next_edge[0] == 2:
-        next = 3
+        next = "3 where next=2"
     elif next_edge[0] == 3:
-        next = 1
-    sql = "UPDATE next SET " + str(next)
+        next = "1 where next=3"
+    sql = "UPDATE next SET " + next
     cursor.execute(sql)
     cursor.close()
     conn.commit()
