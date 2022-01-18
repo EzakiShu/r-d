@@ -56,11 +56,9 @@ def uploads_file():
     #transfer_time = end - response.json()['time']
 
     # next pod
-    if next_edge[0] == 1:
-        next = 2
-    elif next_edge[0] == 2:
-        next = 3
-    elif next_edge[0] == 3:
+    if next_edge[0] < 3:
+        next = next_edge[0] + 1
+    else:
         next = 1
     sql = "UPDATE RoundRobin SET next = " + str(next)
     cursor.execute(sql)
