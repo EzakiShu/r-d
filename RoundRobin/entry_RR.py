@@ -35,7 +35,7 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor()
-    sql = ("SELECT next FROM RoundRobin")
+    sql = ("SELECT next FROM RR")
     cursor.execute(sql)
     next_edge = cursor.fetchone()
 
@@ -57,12 +57,12 @@ def uploads_file():
 
     # next pod
     if next_edge[0] == 1:
-        next = "2 where next=1"
+        next = 2
     elif next_edge[0] == 2:
-        next = "3 where next=2"
+        next = 3
     elif next_edge[0] == 3:
-        next = "1 where next=3"
-    sql = "UPDATE next SET " + next
+        next = 1
+    sql = "UPDATE RoundRobin SET next = " + str(next)
     cursor.execute(sql)
     cursor.close()
     conn.commit()
