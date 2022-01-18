@@ -11,5 +11,6 @@ RUN pip install numpy
 RUN pip install requests
 RUN pip install pillow
 RUN apt install -y libgl1-mesa-dev
+RUN pip install mysql-connector-python
 ENTRYPOINT python upload.py
 

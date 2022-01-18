@@ -1,35 +1,74 @@
-import os, json, sys, requests, cv2
+import requests
+import cv2
+import logging
 import numpy as np
-from flask import Flask, request, redirect, url_for,jsonify
-from flask import send_from_directory, render_template
+import mysql.connector
+from flask import Flask, request
+from flask import render_template
 from werkzeug.utils import secure_filename
-import random, string, datetime
 from converter import i2b, b2i
+import time
 
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
     return render_template('upload.html')
 
+
 @app.route('/', methods=['POST'])
 def uploads_file():
-    #opencvでPOSTされたファイルを読み込む
+    # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
     nparr = np.fromstring(file_data, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    #バイナリに変換
+    # バイナリに変換
     img_b = i2b(img)
 
-    #画像の送信
-    url = "http://python-detection2:8080/api/predict"
+    # database接続
+    conn = mysql.connector.connect(
+        host='mysql-server',
+        port='3306',
+        user='devuser',
+        password='devuser',
+        database='time'
+    )
+    cursor = conn.cursor()
+    sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
+    cursor.execute(sql)
+    min_time_edge = cursor.fetchone()
+
+    # 画像の送信
+    url = "http://python-" + min_time_edge[0] + ":8080/api/predict"
     img_data = {
-        "data":img_b
+        "data": img_b
     }
-    response = requests.post(url,data=img_data)
-    #return jsonify(response.json())
+
+    # 転送時間計測
+    start = time.time()
+
+    # 検知リクエスト
+    response = requests.post(url, data=img_data)
+
+    # 転送時間計測
+    end = time.time() - start
+    transfer_time = end - response.json()['time']
+
+    sql = "UPDATE detection SET time=" + \
+        str(response.json()['time']) + \
+        ",transfer=" + str(transfer_time) + " WHERE pod='" + \
+        min_time_edge[0] + "'"
+    cursor.execute(sql)
+    cursor.close()
+    conn.commit()
+    conn.close()
+
     img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
+    #time = response.json()['time']
+    # return str(time)
     return img
 
+
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=8080,threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=8080, threaded=True)
