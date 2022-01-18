@@ -40,7 +40,7 @@ def uploads_file():
     next_edge = cursor.fetchone()
 
     # 画像の送信
-    url = "http://python-detection" + next_edge[0] + ":8080/api/predict"
+    url = "http://python-detection" + str(next_edge[0]) + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
