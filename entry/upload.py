@@ -37,7 +37,7 @@ def uploads_file():
         password='devuser',
         database='time'
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
     sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
     min_time_edge = cursor.fetchone()
