@@ -26,6 +26,9 @@ def uploads_file():
     # バイナリに変換
     img_b = i2b(img)
 
+    # データサイズ
+    size = len(img_b) / 1000000
+
     # database接続
     conn = mysql.connector.connect(
         host='mysql-server',
@@ -34,7 +37,7 @@ def uploads_file():
         password='devuser',
         database='time'
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(buffered=True)
     sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
     min_time_edge = cursor.fetchone()
@@ -54,6 +57,8 @@ def uploads_file():
     # 転送時間計測
     end = time.time() - start
     transfer_time = end - response.json()['time']
+    end /= size
+    transfer_time /= size
 
     sql = "UPDATE detection SET time=" + \
         str(response.json()['time']) + \
