@@ -19,10 +19,15 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
+
+    # 処理時間測定
+    start = time.time()
+
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
     nparr = np.fromstring(file_data, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
     # バイナリに変換
     img_b = i2b(img)
 
@@ -49,27 +54,35 @@ def uploads_file():
     }
 
     # 転送時間計測
-    start = time.time()
+    #start = time.time()
 
     # 検知リクエスト
     response = requests.post(url, data=img_data)
 
     # 転送時間計測
-    end = time.time() - start
-    transfer_time = end - response.json()['time']
-    end /= size
-    transfer_time /= size
+    #end = time.time() - start
+    #transfer_time = end - response.json()['time']
+    #end /= size
+    #transfer_time /= size
 
-    sql = "UPDATE detection SET time=" + \
-        str(response.json()['time']) + \
-        ",transfer=" + str(transfer_time) + " WHERE pod='" + \
-        min_time_edge[0] + "'"
+    # sql = "UPDATE detection SET time=" + \
+    #     str(response.json()['time']) + \
+    #     ",transfer=" + str(transfer_time) + " WHERE pod='" + \
+    #     min_time_edge[0] + "'"
+
+    # 処理時間測定
+    end = time.time() - start
+    end /= size
+
+    sql = "UPDATE detection SET time=" + end + \
+        " WHERE pod ='" + min_time_edge[0] + "'"
     cursor.execute(sql)
     cursor.close()
     conn.commit()
     conn.close()
 
-    img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
+    img = '<img src="data:image/png;base64,' + response.json()['data1'] + '"/>' \
+        '<img src="data:image/png;base64,' + response.json()['data2'] + '"/>'
     #time = response.json()['time']
     # return str(time)
     return img
