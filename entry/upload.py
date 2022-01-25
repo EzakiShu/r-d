@@ -75,7 +75,7 @@ def uploads_file():
     end /= size
 
     sql = "UPDATE detection SET time=" + end + \
-        " WHERE pod ='" + min_time_edge[0] + "'"
+        " WHERE pod='" + str(min_time_edge[0]) + "'"
     cursor.execute(sql)
     cursor.close()
     conn.commit()
