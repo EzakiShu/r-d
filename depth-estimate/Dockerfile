@@ -6,6 +6,7 @@ RUN apt install -y libgl1-mesa-dev unzip
 RUN python -m pip install --upgrade pip
 RUN pip install Flask opencv-python numpy pillow matplotlib requests
 RUN pip install torch torchvision  scikit-image
+RUN pip install mysql-connector-python
 RUN git clone https://github.com/nianticlabs/monodepth2.git
 RUN git clone https://github.com/EzakiShu/r-d.git
 WORKDIR r-d/
