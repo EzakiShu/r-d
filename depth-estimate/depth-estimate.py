@@ -82,4 +82,4 @@ if __name__ == "__main__":
     device, feed, encoder, depth_decoder = load_model(art_args)
 
     # サーバーの起動
-    app.run(debug=False, host='0.0.0.0', port=8080, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=8090, threaded=True)
