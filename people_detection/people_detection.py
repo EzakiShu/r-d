@@ -10,6 +10,7 @@ from PIL import Image, ImageOps
 from converter import i2b, b2i
 from io import BytesIO
 import time
+import requests
 import mysql.connector
 
 app = Flask(__name__)
@@ -34,7 +35,21 @@ def hello():
 @app.route('/api/predict', methods=["POST"])
 def predict():
     # 実行時間計測
-    start = time.time()
+    #start = time.time()
+
+    # database接続
+    conn = mysql.connector.connect(
+        host='mysql-server',
+        port='3306',
+        user='devuser',
+        password='devuser',
+        database='time'
+    )
+    cursor = conn.cursor(buffered=True)
+    sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
+    cursor.execute(sql)
+    min_time_edge = cursor.fetchone()
+
     global graph
     with graph.as_default():
         # POSTされたファイルをOpenCVに変換
@@ -52,13 +67,21 @@ def predict():
         # バイナリに変換
         img_b = i2b(cv_image)
 
-        # 実行時間の計算
-        end = time.time() - start
-
-        # 画像と実行時間の返信
+        # 距離推定
+        url = "http://python-" + min_time_edge[0] + ":8090/depth"
         img_data = {
-            "data": img_b,
-            "time": end
+            "data": request.form['data']
+        }
+        response = requests.post(url, data=img_data)
+
+        # 実行時間の計算
+        # end = time.time() - start
+
+        # 画像の返信
+        img_data = {
+            "data1": img_b,
+            "data2": response.json()['data']
+            # "time": end
         }
 
         return jsonify(img_data)
