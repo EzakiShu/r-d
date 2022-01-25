@@ -18,7 +18,7 @@
 # RUN wget https://pjreddie.com/media/files/yolov3.weights
 # RUN python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
 
-FROM people_detection169
+FROM yoichi00/containers/people_detection169
 ARG BRANCH=main
 EXPOSE 5000
 WORKDIR keras-yolo3
