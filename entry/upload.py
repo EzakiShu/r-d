@@ -54,6 +54,7 @@ def uploads_file():
 
     # 検知リクエスト
     response = requests.post(url, data=img_data)
+    detection_img = response.json()['data1']
 
     # 実行時間計測
     detection = time.time() - detection
@@ -73,8 +74,9 @@ def uploads_file():
 
     url = "http://python-" + min_time_edge2[0] + ":8080/depth"
 
-    # 検知リクエスト
+    # 距離推定リクエスト
     response = requests.post(url, data=img_data)
+    depth_img = response.json()['data2']
 
     # 実行時間計測
     depth = time.time() - depth
@@ -88,7 +90,8 @@ def uploads_file():
     conn.commit()
     conn.close()
 
-    img = '<img src="data:image/png;base64,' + response.json()['data1'] + '"/>'
+    img = '<img src="data:image/png;base64,' + detection_img + \
+        '"/>' '<img src="data:image/png;base64,' + depth_img + '"/>'
     return img
 
 
