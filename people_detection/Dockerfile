@@ -30,7 +30,7 @@
 # ENTRYPOINT python people_detection.py
 
 FROM python:3.6
-ARG BRANCH=main
+ARG BRANCH=connect
 EXPOSE 5000
 RUN git clone https://github.com/EzakiShu/r-d.git
 WORKDIR r-d/people_detection
