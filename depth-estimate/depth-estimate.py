@@ -49,7 +49,8 @@ def upload():
 @app.route('/depth', methods=["POST"])
 def estimate():
     # POSTされたファイルをOpenCVに変換
-    file_data = request.files['file'].read()
+    #file_data = request.files['file'].read()
+    file_data = request.form['data2']
     image_np = np.fromstring(file_data, np.uint8)
     image = cv2.imdecode(image_np, cv2.IMREAD_COLOR)  # opencv image (narray)
 
@@ -60,7 +61,7 @@ def estimate():
     res_image = read_pipe.recv()
     # 画像の返信
     img_data = {
-        "data": res_image
+        "data2": res_image
     }
     read_pipe.close()
     write_pipe.close()
@@ -82,4 +83,4 @@ if __name__ == "__main__":
     device, feed, encoder, depth_decoder = load_model(art_args)
 
     # サーバーの起動
-    app.run(debug=False, host='0.0.0.0', port=8090, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=8080, threaded=True)
