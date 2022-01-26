@@ -45,6 +45,7 @@ RUN pip install keras==2.2.4
 RUN pip install numpy==1.16.1
 RUN pip install scipy
 RUN pip install pillow
+RUN pip install requests
 RUN pip install matplotlib
 RUN apt install -y libgl1-mesa-dev 
 RUN pip install mysql-connector-python
