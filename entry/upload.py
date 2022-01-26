@@ -45,12 +45,17 @@ def uploads_file():
     cursor = conn.cursor(buffered=True)
     sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
-    min_time_edge = cursor.fetchone()
+    min_time_edge1 = cursor.fetchone()
+
+    sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
+    cursor.execute(sql)
+    min_time_edge2 = cursor.fetchone()
 
     # 画像の送信
-    url = "http://python-" + min_time_edge[0] + ":8080/api/predict"
+    url = "http://python-" + min_time_edge1[0] + ":8080/api/predict"
     img_data = {
-        "data": img_b
+        "data1": img_b,
+        "nextedge": min_time_edge2[0]
     }
 
     # 転送時間計測
@@ -72,20 +77,25 @@ def uploads_file():
 
     # 処理時間測定
     end = time.time() - start
+    end -= response.json()['time']
     end /= size
 
     #edge_num = str(min_time_edge[0])
 
     sql = "UPDATE detection SET time=" + str(end) + \
-        " WHERE pod='" + min_time_edge[0] + "'"
-    # print(type(min_time_edge[0]))
+        " WHERE pod='" + min_time_edge1[0] + "'"
+    cursor.execute(sql)
+
+    sql = "UPDATE depth SET time=" + str(response.json()['time']) + \
+        " WHERE pod='" + min_time_edge2[0] + "'"
+
     cursor.execute(sql)
     cursor.close()
     conn.commit()
     conn.close()
 
-    img = '<img src="data:image/png;base64,' + response.json()['data1'] + '"/>' \
-        '<img src="data:image/png;base64,' + response.json()['data2'] + '"/>'
+    img = '<img src="data1:image/png;base64,' + response.json()['data1'] + '"/>' \
+        #'<img src="data2:image/png;base64,' + response.json()['data2'] + '"/>'
     #time = response.json()['time']
     # return str(time)
     return img

@@ -38,10 +38,14 @@ jobs:
           command: echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USER --password-stdin
       - run:
           name: Build Image
-          command: docker build -f people_detection/Dockerfile . --tag $DOCKERHUB_REPO:people_detection$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
+          command: docker build -f entry/Dockerfile . --tag $DOCKERHUB_REPO:entry$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
+          #command: docker build -f people_detection/Dockerfile . --tag $DOCKERHUB_REPO:people_detection$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
+          #command: docker build -f depth-estimate/Dockerfile . --tag $DOCKERHUB_REPO:depth-estimate$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
       - run:
           name: Push Image
-          command: docker push $DOCKERHUB_REPO:people_detection$CIRCLE_BUILD_NUM
+          command: docker push $DOCKERHUB_REPO:entry$CIRCLE_BUILD_NUM
+          #command: docker push $DOCKERHUB_REPO:people_detection$CIRCLE_BUILD_NUM
+          #command: docker push $DOCKERHUB_REPO:depth-estimate$CIRCLE_BUILD_NUM
 
   update:
     docker:
