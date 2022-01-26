@@ -11,7 +11,7 @@ from converter import i2b, b2i
 from io import BytesIO
 import time
 import requests
-import mysql.connector
+#import mysql.connector
 
 app = Flask(__name__)
 
@@ -34,26 +34,26 @@ def hello():
 
 @app.route('/api/predict', methods=["POST"])
 def predict():
-    # 実行時間計測
-    #start = time.time()
+    # 処理時間測定
+    start = time.time()
 
     # database接続
-    conn = mysql.connector.connect(
-        host='mysql-server',
-        port='3306',
-        user='devuser',
-        password='devuser',
-        database='time'
-    )
-    cursor = conn.cursor(buffered=True)
-    sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
-    cursor.execute(sql)
-    min_time_edge = cursor.fetchone()
+    # conn = mysql.connector.connect(
+    #     host='mysql-server',
+    #     port='3306',
+    #     user='devuser',
+    #     password='devuser',
+    #     database='time'
+    # )
+    # cursor = conn.cursor(buffered=True)
+    # sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
+    # cursor.execute(sql)
+    # min_time_edge = cursor.fetchone()
 
     global graph
     with graph.as_default():
         # POSTされたファイルをOpenCVに変換
-        image_data = b2i(request.form['data'])
+        image_data = b2i(request.form['data1'])
 
         # OpenCV -> Pillow
         image = Image.fromarray(image_data)
@@ -68,20 +68,20 @@ def predict():
         img_b = i2b(cv_image)
 
         # 距離推定
-        url = "http://python-" + min_time_edge[0] + ":8090/depth"
+        url = "http://python-" + request.form['nextedge'] + ":8080/depth"
         img_data = {
-            "data": request.form['data']
+            "data2": request.form['data1']
         }
         response = requests.post(url, data=img_data)
 
         # 実行時間の計算
-        # end = time.time() - start
+        end = time.time() - start
 
         # 画像の返信
         img_data = {
             "data1": img_b,
-            "data2": response.json()['data']
-            # "time": end
+            "data2": response.json()['data2'],
+            "time": end
         }
 
         return jsonify(img_data)
@@ -99,4 +99,4 @@ if __name__ == "__main__":
     model = YOLO(**vars(Namespace))
 
     # サーバーの起動
-    app.run(debug=False, host='0.0.0.0', port=8081, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=8080, threaded=True)
