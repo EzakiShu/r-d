@@ -45,15 +45,14 @@ def uploads_file():
         "data": img_b
     }
 
-    # 転送時間計測
-    #start = time.time()
-
     # 検知リクエスト
     response = requests.post(url, data=img_data)
+    detection_img = response.json()['data1']
 
-    # 転送時間計測
-    #end = time.time() - start
-    #transfer_time = end - response.json()['time']
+    # 距離推定リクエスト
+    url = "http://python-depth" + str(next_edge[0]) + ":8080/depth"
+    response = requests.post(url, data=img_data)
+    depth_img = response.json()['data2']
 
     # next pod
     if next_edge[0] < 3:
@@ -66,9 +65,8 @@ def uploads_file():
     conn.commit()
     conn.close()
 
-    img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
-    #time = response.json()['time']
-    # return str(time)
+    img = '<img src="data:image/png;base64,' + detection_img + \
+        '"/>' '<img src="data:image/png;base64,' + depth_img + '"/>'
     return img
 
 
