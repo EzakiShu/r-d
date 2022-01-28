@@ -19,6 +19,9 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
+    # 実行時間計測
+    detection = time.time()
+
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
     nparr = np.fromstring(file_data, np.uint8)
@@ -45,30 +48,48 @@ def uploads_file():
         "data": img_b
     }
 
-    # 転送時間計測
-    #start = time.time()
-
     # 検知リクエスト
     response = requests.post(url, data=img_data)
+    detection_img = response.json()['data1']
 
-    # 転送時間計測
-    #end = time.time() - start
-    #transfer_time = end - response.json()['time']
+    # 実行時間計測
+    detection = time.time() - detection
+
+    # DB更新
+    # sql = "UPDATE detection SET time=" + \
+    #     str(detection) + "WHERE pod=depth'" + str(next_edge[0]) + "'"
+    # cursor.execute(sql)
+
+    # 実行時間計測
+    depth = time.time()
+
+    # 距離推定リクエスト
+    url = "http://python-depth" + str(next_edge[0]) + ":8080/depth"
+    response = requests.post(url, data=img_data)
+    depth_img = response.json()['data2']
+
+    # 実行時間計測
+    depth = time.time() - depth
+
+    # DB更新
+    # sql = "UPDATE depth SET time=" + \
+    #     str(depth) + "WHERE pod='" + str(next_edge[0]) + "'"
+    # cursor.execute(sql)
 
     # next pod
-    if next_edge[0] < 3:
+    if next_edge[0] < 6:
         next = next_edge[0] + 1
     else:
         next = 1
     sql = "UPDATE RoundRobin SET next = " + str(next)
+
     cursor.execute(sql)
     cursor.close()
     conn.commit()
     conn.close()
 
-    img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
-    #time = response.json()['time']
-    # return str(time)
+    img = '<img src="data:image/png;base64,' + detection_img + \
+        '"/>' '<img src="data:image/png;base64,' + depth_img + '"/>'
     return img
 
 

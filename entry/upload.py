@@ -19,10 +19,14 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
+    # 実行時間計測
+    detection = time.time()
+
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
     nparr = np.fromstring(file_data, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
     # バイナリに変換
     img_b = i2b(img)
 
@@ -40,38 +44,54 @@ def uploads_file():
     cursor = conn.cursor(buffered=True)
     sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
-    min_time_edge = cursor.fetchone()
+    min_time_edge1 = cursor.fetchone()
 
     # 画像の送信
-    url = "http://python-" + min_time_edge[0] + ":8080/api/predict"
+    url = "http://python-" + min_time_edge1[0] + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
 
-    # 転送時間計測
-    start = time.time()
-
     # 検知リクエスト
     response = requests.post(url, data=img_data)
+    detection_img = response.json()['data1']
 
-    # 転送時間計測
-    end = time.time() - start
-    transfer_time = end - response.json()['time']
-    end /= size
-    transfer_time /= size
+    # 実行時間計測
+    detection = time.time() - detection
+    detection /= size
 
+    # DB更新
     sql = "UPDATE detection SET time=" + \
-        str(response.json()['time']) + \
-        ",transfer=" + str(transfer_time) + " WHERE pod='" + \
-        min_time_edge[0] + "'"
+        str(detection) + "WHERE pod='" + min_time_edge1[0] + "'"
     cursor.execute(sql)
+
+    # 実行時間計測
+    depth = time.time()
+
+    sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
+    cursor.execute(sql)
+    min_time_edge2 = cursor.fetchone()
+
+    url = "http://python-" + min_time_edge2[0] + ":8080/depth"
+
+    # 距離推定リクエスト
+    response = requests.post(url, data=img_data)
+    depth_img = response.json()['data2']
+
+    # 実行時間計測
+    depth = time.time() - depth
+
+    # DB更新
+    sql = "UPDATE depth SET time=" + \
+        str(depth) + "WHERE pod='" + min_time_edge2[0] + "'"
+    cursor.execute(sql)
+
     cursor.close()
     conn.commit()
     conn.close()
 
-    img = '<img src="data:image/png;base64,' + response.json()['data'] + '"/>'
-    #time = response.json()['time']
-    # return str(time)
+    img = '<img src="data:image/png;base64,' + detection_img + \
+        '"/>' '<img src="data:image/png;base64,' + depth_img + '"/>'
     return img
 
 
