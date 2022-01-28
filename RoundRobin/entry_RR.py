@@ -77,7 +77,7 @@ def uploads_file():
     # cursor.execute(sql)
 
     # next pod
-    if next_edge[0] < 3:
+    if next_edge[0] < 6:
         next = next_edge[0] + 1
     else:
         next = 1
