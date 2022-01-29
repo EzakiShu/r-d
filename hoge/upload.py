@@ -91,8 +91,10 @@ def uploads_file():
     conn.close()
 
     time_data = {
-        "detection": detection,
-        "depth": depth
+        "detection_pod": min_time_edge1[0],
+        "detection_name": detection,
+        "depth_pod": min_time_edge2[0],
+        "depth_name": depth
     }
     return jsonify(time_data)
 
