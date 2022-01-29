@@ -92,9 +92,9 @@ def uploads_file():
 
     time_data = {
         "detection_pod": min_time_edge1[0],
-        "detection_name": detection,
+        "detection_time": detection,
         "depth_pod": min_time_edge2[0],
-        "depth_name": depth
+        "depth_time": depth
     }
     return jsonify(time_data)
 
