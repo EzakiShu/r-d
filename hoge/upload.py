@@ -19,8 +19,6 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
-    # 実行時間計測
-    detection = time.time()
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -52,6 +50,9 @@ def uploads_file():
         "data": img_b
     }
 
+    # 実行時間計測
+    detection = time.time()
+
     # 検知リクエスト
     response = requests.post(url, data=img_data)
     detection_img = response.json()['data1']
@@ -65,14 +66,14 @@ def uploads_file():
         str(detection) + "WHERE pod='" + min_time_edge1[0] + "'"
     cursor.execute(sql)
 
-    # 実行時間計測
-    depth = time.time()
-
     sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
     cursor.execute(sql)
     min_time_edge2 = cursor.fetchone()
 
     url = "http://python-" + min_time_edge2[0] + ":8080/depth"
+
+    # 実行時間計測
+    depth = time.time()
 
     # 距離推定リクエスト
     response = requests.post(url, data=img_data)
