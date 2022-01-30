@@ -46,7 +46,7 @@ def uploads_file():
     cursor.execute(sql)
     task1 = cursor.fetchall()
 
-    time_estimate = [3]
+    time_estimate = [0.0, 0.0, 0.0]
 
     for i in range(3):
         hold = task1[i][2] - task1[i][3]
