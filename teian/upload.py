@@ -46,15 +46,15 @@ def uploads_file():
     cursor.execute(sql)
     task1 = cursor.fetchall()
 
-    time_estimate = [len(task1)]
+    time_estimate = [3]
 
-    for i in range(len(task1)):
+    for i in range(3):
         hold = task1[i][2] - task1[i][3]
         time_estimate[i] = task1[i][0] * float(hold)
 
     min1 = 10000
 
-    for i in range(len(time_estimate)):
+    for i in range(3):
         if time_estimate[i] < min1:
             min1 = i + 1
 
@@ -89,15 +89,15 @@ def uploads_file():
     cursor.execute(sql)
     task2 = cursor.fetchall()
 
-    time_estimate = [len(task2)]
+    time_estimate = [3]
 
-    for i in range(len(task2)):
+    for i in range(3):
         hold = task2[i][2] - task2[i][3]
         time_estimate[i] = task2[i][0] * float(hold)
 
     min2 = 10000
 
-    for i in range(len(time_estimate)):
+    for i in range(3):
         if time_estimate[i] < min2:
             min2 = i + 1
 
