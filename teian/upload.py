@@ -49,8 +49,8 @@ def uploads_file():
     time_estimate = [0.0, 0.0, 0.0]
 
     for i in range(3):
-        hold = task1[i][2] - task1[i][3] + 1
-        time_estimate[i] = task1[i][0] * float(hold)
+        hold = task1[i][2] - task1[i][3]
+        time_estimate[i] = task1[i][1] * float(hold)
 
     min = 10000
 
@@ -92,7 +92,7 @@ def uploads_file():
 
     for i in range(3):
         hold = task2[i][2] - task2[i][3]
-        time_estimate[i] = task2[i][0] * float(hold)
+        time_estimate[i] = task2[i][1] * float(hold)
 
     min = 10000
 
