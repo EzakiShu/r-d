@@ -56,6 +56,7 @@ def uploads_file():
 
     for i in range(3):
         if time_estimate[i] < min:
+            min = time_estimate[i]
             min_edge1 = i + 1
 
     # 画像の送信
@@ -98,6 +99,7 @@ def uploads_file():
 
     for i in range(3):
         if time_estimate[i] < min:
+            min = time_estimate[i]
             min_edge2 = i + 1
 
     url = "http://python-depth" + str(min_edge2) + ":8080/depth"
