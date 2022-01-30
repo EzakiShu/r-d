@@ -42,7 +42,7 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor(buffered=True)
-    sql = ("SELECT * FROM detection")
+    sql = ("SELECT * FROM teian_detection")
     cursor.execute(sql)
     task1 = cursor.fetchall()
 
@@ -64,7 +64,7 @@ def uploads_file():
         "data": img_b
     }
 
-    sql = ("UPDATE detection SET access = access + 1 where pod=" + str(min1))
+    sql = ("UPDATE teian_detection SET access = access + 1 where pod=" + str(min1))
     cursor.execute(sql)
 
     # 検知リクエスト
@@ -76,16 +76,16 @@ def uploads_file():
     detection /= size
 
     # DB更新
-    sql = "UPDATE detection SET time=" + \
+    sql = "UPDATE teian_detection SET time=" + \
         str(detection) + "WHERE pod=" + str(min1)
     cursor.execute(sql)
-    sql = ("UPDATE detection SET fin = fin + 1 where pod=" + str(min1))
+    sql = ("UPDATE teian_detection SET fin = fin + 1 where pod=" + str(min1))
     cursor.execute(sql)
 
     # 実行時間計測
     depth = time.time()
 
-    sql = ("SELECT * FROM depth")
+    sql = ("SELECT * FROM teian_depth")
     cursor.execute(sql)
     task2 = cursor.fetchall()
 
@@ -103,21 +103,21 @@ def uploads_file():
 
     url = "http://python-depth" + str(min2) + ":8080/depth"
 
-    sql = ("UPDATE depth SET access = access + 1 where pod=" + str(min2))
+    sql = ("UPDATE teian_depth SET access = access + 1 where pod=" + str(min2))
     cursor.execute(sql)
 
     # 距離推定リクエスト
     response = requests.post(url, data=img_data)
     depth_img = response.json()['data2']
 
-    sql = ("UPDATE depth SET fin = fin + 1 where pod=" + str(min2))
+    sql = ("UPDATE teian_depth SET fin = fin + 1 where pod=" + str(min2))
     cursor.execute(sql)
 
     # 実行時間計測
     depth = time.time() - depth
 
     # DB更新
-    sql = "UPDATE depth SET time=" + \
+    sql = "UPDATE teian_depth SET time=" + \
         str(depth) + "WHERE pod=" + str(min2)
     cursor.execute(sql)
 
