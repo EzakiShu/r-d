@@ -49,22 +49,23 @@ def uploads_file():
     time_estimate = [0.0, 0.0, 0.0]
 
     for i in range(3):
-        hold = task1[i][2] - task1[i][3]
+        hold = task1[i][2] - task1[i][3] + 1
         time_estimate[i] = task1[i][0] * float(hold)
 
-    min1 = 10000
+    min = 10000
 
     for i in range(3):
-        if time_estimate[i] < min1:
-            min1 = i + 1
+        if time_estimate[i] < min:
+            min_edge1 = i + 1
 
     # 画像の送信
-    url = "http://python-detection" + str(min1) + ":8080/api/predict"
+    url = "http://python-detection" + str(min_edge1) + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
 
-    sql = ("UPDATE teian_detection SET access = access + 1 where pod=" + str(min1))
+    sql = ("UPDATE teian_detection SET access = access + 1, time = " +
+           str(time_estimate[i]) + "where pod=" + str(min_edge1))
     cursor.execute(sql)
 
     # 検知リクエスト
@@ -76,10 +77,8 @@ def uploads_file():
     detection /= size
 
     # DB更新
-    sql = "UPDATE teian_detection SET time=" + \
-        str(detection) + "WHERE pod=" + str(min1)
-    cursor.execute(sql)
-    sql = ("UPDATE teian_detection SET fin = fin + 1 where pod=" + str(min1))
+    sql = "UPDATE teian_detection SET fin = fin + 1, time=" + \
+        str(detection) + "WHERE pod=" + str(min_edge1)
     cursor.execute(sql)
 
     # 実行時間計測
@@ -95,30 +94,27 @@ def uploads_file():
         hold = task2[i][2] - task2[i][3]
         time_estimate[i] = task2[i][0] * float(hold)
 
-    min2 = 10000
+    min = 10000
 
     for i in range(3):
-        if time_estimate[i] < min2:
-            min2 = i + 1
+        if time_estimate[i] < min:
+            min_edge2 = i + 1
 
-    url = "http://python-depth" + str(min2) + ":8080/depth"
+    url = "http://python-depth" + str(min_edge2) + ":8080/depth"
 
-    sql = ("UPDATE teian_depth SET access = access + 1 where pod=" + str(min2))
+    sql = ("UPDATE teian_depth SET access = access + 1 where pod=" + str(min_edge2))
     cursor.execute(sql)
 
     # 距離推定リクエスト
     response = requests.post(url, data=img_data)
     depth_img = response.json()['data2']
 
-    sql = ("UPDATE teian_depth SET fin = fin + 1 where pod=" + str(min2))
-    cursor.execute(sql)
-
     # 実行時間計測
     depth = time.time() - depth
 
     # DB更新
-    sql = "UPDATE teian_depth SET time=" + \
-        str(depth) + "WHERE pod=" + str(min2)
+    sql = "UPDATE teian_depth SET fin = fin + 1, time=" + \
+        str(depth) + "WHERE pod=" + str(min_edge2)
     cursor.execute(sql)
 
     cursor.close()
@@ -126,9 +122,9 @@ def uploads_file():
     conn.close()
 
     time_data = {
-        "detection_pod": min1,
+        "detection_pod": min_edge1,
         "detection_time": detection,
-        "depth_pod": min2,
+        "depth_pod": min_edge2,
         "depth_time": depth
     }
     return jsonify(time_data)
