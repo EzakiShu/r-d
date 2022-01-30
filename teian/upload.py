@@ -19,8 +19,6 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
-    # 実行時間計測
-    detection = time.time()
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -69,6 +67,9 @@ def uploads_file():
            str(time_estimate[i]) + "where pod=" + str(min_edge1))
     cursor.execute(sql)
 
+    # 実行時間計測
+    detection = time.time()
+
     # 検知リクエスト
     response = requests.post(url, data=img_data)
     detection_img = response.json()['data1']
@@ -81,9 +82,6 @@ def uploads_file():
     sql = "UPDATE teian_detection SET fin = fin + 1, time=" + \
         str(detection) + "WHERE pod=" + str(min_edge1)
     cursor.execute(sql)
-
-    # 実行時間計測
-    depth = time.time()
 
     sql = ("SELECT * FROM teian_depth")
     cursor.execute(sql)
@@ -106,6 +104,9 @@ def uploads_file():
 
     sql = ("UPDATE teian_depth SET access = access + 1 where pod=" + str(min_edge2))
     cursor.execute(sql)
+
+    # 実行時間計測
+    depth = time.time()
 
     # 距離推定リクエスト
     response = requests.post(url, data=img_data)
