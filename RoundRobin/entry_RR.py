@@ -95,6 +95,7 @@ def uploads_file():
 
     all_time = time.time() - all_time
     time_data = {
+        "edge": next_edge[0],
         "exec": all_time
     }
     return jsonify(time_data)
