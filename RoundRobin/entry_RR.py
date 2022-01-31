@@ -20,7 +20,7 @@ def index():
 @app.route('/', methods=['POST'])
 def uploads_file():
     # 実行時間計測
-    detection = time.time()
+    all_time = time.time()
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -48,6 +48,7 @@ def uploads_file():
         "data": img_b
     }
 
+    detection = time.time()
     # 検知リクエスト
     response = requests.post(url, data=img_data)
     detection_img = response.json()['data1']
@@ -90,7 +91,13 @@ def uploads_file():
 
     img = '<img src="data:image/png;base64,' + detection_img + \
         '"/>' '<img src="data:image/png;base64,' + depth_img + '"/>'
-    return img
+    # return img
+
+    all_time = time.time() - all_time
+    time_data = {
+        "exec": all_time
+    }
+    return jsonify(time_data)
 
 
 if __name__ == "__main__":
