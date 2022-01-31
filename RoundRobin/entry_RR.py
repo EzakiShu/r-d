@@ -3,7 +3,7 @@ import cv2
 import logging
 import numpy as np
 import mysql.connector
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask import render_template
 from werkzeug.utils import secure_filename
 from converter import i2b, b2i
@@ -101,4 +101,4 @@ def uploads_file():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=8080, threaded=True)
+    app.run(debug=True, host='0.0.0.0', port=8080, threaded=True)
