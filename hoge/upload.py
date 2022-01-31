@@ -20,6 +20,8 @@ def index():
 @app.route('/', methods=['POST'])
 def uploads_file():
 
+    all_time = time.time()
+
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
     nparr = np.fromstring(file_data, np.uint8)
@@ -91,11 +93,13 @@ def uploads_file():
     conn.commit()
     conn.close()
 
+    all_time = time.time() - all_time
     time_data = {
         "detection_pod": min_time_edge1[0],
         "detection_time": detection,
         "depth_pod": min_time_edge2[0],
-        "depth_time": depth
+        "depth_time": depth,
+        "exec": all_time
     }
     return jsonify(time_data)
 
