@@ -38,6 +38,8 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor()
+    sql = ("SELECT GET_LOCK('lock'),5")
+    cursor.execute(sql)
     sql = ("SELECT next FROM RoundRobin")
     cursor.execute(sql)
     next_edge = cursor.fetchone()
@@ -48,6 +50,8 @@ def uploads_file():
     else:
         next = 1
     sql = "UPDATE RoundRobin SET next = " + str(next)
+    cursor.execute(sql)
+    sql = ("SELECT COALESCE(RELEASE_LOCK'lock'), 5")
     cursor.execute(sql)
 
     # 画像の送信
