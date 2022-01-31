@@ -42,6 +42,14 @@ def uploads_file():
     cursor.execute(sql)
     next_edge = cursor.fetchone()
 
+    # next pod
+    if next_edge[0] < 3:
+        next = next_edge[0] + 1
+    else:
+        next = 1
+    sql = "UPDATE RoundRobin SET next = " + str(next)
+    cursor.execute(sql)
+
     # 画像の送信
     url = "http://python-detection" + str(next_edge[0]) + ":8080/api/predict"
     img_data = {
@@ -77,14 +85,6 @@ def uploads_file():
     #     str(depth) + "WHERE pod='" + str(next_edge[0]) + "'"
     # cursor.execute(sql)
 
-    # next pod
-    if next_edge[0] < 3:
-        next = next_edge[0] + 1
-    else:
-        next = 1
-    sql = "UPDATE RoundRobin SET next = " + str(next)
-
-    cursor.execute(sql)
     cursor.close()
     conn.commit()
     conn.close()
