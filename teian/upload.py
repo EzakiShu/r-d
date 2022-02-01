@@ -26,7 +26,6 @@ def uploads_file():
 
     global count
     count += 1
-    print(count)
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -105,7 +104,8 @@ def uploads_file():
         "detection_time": detection,
         "depth_pod": min_time_edge2[0],
         "depth_time": depth,
-        "exec": all_time
+        "exec": all_time,
+        "count": count
     }
     return jsonify(time_data)
 
