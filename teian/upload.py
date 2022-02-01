@@ -52,18 +52,26 @@ def uploads_file():
     sql = ("SELECT * FROM detection")
     cursor.execute(sql)
     min_time_edge1 = cursor.fetchall()
-    select_edge1 = min(
-        min_time_edge1[0][1], min_time_edge1[1][1], min_time_edge1[2][1])
+
+    k = 0
+    j = 0
+    select_edge1 = 0
+    for i in range(3):
+        if min_time_edge1[i][1] > min_time_edge1[i+1][1]:
+            k = min_time_edge1[i+1][0]
+            j = min_time_edge1[i+1][1]
+            min_time_edge1[i+1][0] = min_time_edge1[i][0]
+            min_time_edge1[i+1][1] = min_time_edge1[i][1]
+            min_time_edge1[i][0] = k
+            min_time_edge1[i][1] = j
 
     global pre_select_edge1
     if pre_select_edge1 == select_edge1:
-        select_edge1 = sorted(
-            min_time_edge1[0][1], min_time_edge1[1][1], min_time_edge1[2][1])[2]
-
+        select_edge1 = min_time_edge1[i][0]
     pre_select_edge1 = select_edge1
 
     # 画像の送信
-    url = "http://python-detection" + select_edge1 + ":8080/api/predict"
+    url = "http://python-detection" + str(select_edge1) + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
@@ -81,7 +89,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE detection SET time=" + \
-        str(detection) + "WHERE pod=detection'" + select_edge1 + "'"
+        str(detection) + "WHERE pod=detection'" + str(select_edge1) + "'"
     cursor.execute(sql)
 
     sql = ("SELECT * FROM depth")
@@ -97,7 +105,7 @@ def uploads_file():
             min_time_edge2[0][1], min_time_edge2[1][1], min_time_edge2[2][1])[2]
 
     pre_select_edge2 = select_edge2
-    url = "http://python-depth" + select_edge2 + ":8080/depth"
+    url = "http://python-depth" + str(select_edge2) + ":8080/depth"
 
     # 実行時間計測
     depth = time.time()
@@ -111,7 +119,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE depth SET time=" + \
-        str(depth) + "WHERE pod=depth'" + select_edge2 + "'"
+        str(depth) + "WHERE pod=depth'" + str(select_edge2) + "'"
     cursor.execute(sql)
 
     cursor.close()
