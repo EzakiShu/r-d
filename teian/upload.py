@@ -26,7 +26,7 @@ def uploads_file():
 
     global count
     count += 1
-
+    print("")
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
     nparr = np.fromstring(file_data, np.uint8)
