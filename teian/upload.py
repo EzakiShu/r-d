@@ -49,7 +49,7 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor(buffered=True)
-    sql = ("SELECT pod FROM detection")
+    sql = ("SELECT * FROM detection")
     cursor.execute(sql)
     min_time_edge1 = cursor.fetchall()
     select_edge1 = min(
@@ -84,7 +84,7 @@ def uploads_file():
         str(detection) + "WHERE pod=detection'" + select_edge1 + "'"
     cursor.execute(sql)
 
-    sql = ("SELECT pod FROM depth")
+    sql = ("SELECT * FROM depth")
     cursor.execute(sql)
     min_time_edge2 = cursor.fetchall()
 
