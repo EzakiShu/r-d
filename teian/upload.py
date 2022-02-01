@@ -51,23 +51,28 @@ def uploads_file():
     cursor = conn.cursor(buffered=True)
     sql = ("SELECT * FROM detection")
     cursor.execute(sql)
-    min_time_edge1 = cursor.fetchall()
+    task1 = cursor.fetchall()
 
-    k = 0
-    j = 0
-    select_edge1 = 0
+    exec_time = [[0]*3]
+    exec_name = [[0]*3]
     for i in range(3):
-        if min_time_edge1[i][1] > min_time_edge1[i+1][1]:
-            k = min_time_edge1[i+1][0]
-            j = min_time_edge1[i+1][1]
-            min_time_edge1[i+1][0] = min_time_edge1[i][0]
-            min_time_edge1[i+1][1] = min_time_edge1[i][1]
-            min_time_edge1[i][0] = k
-            min_time_edge1[i][1] = j
+        exec_name[i] = task1[i][0]
+        exec_time[i] = task1[i][1]
+    k = 0
+    l = 0
+    for i in range(3):
+        if exec_time[i] > exec_time[i+1]:
+            k = exec_name[i+1]
+            l = exec_time[i+1]
+            exec_name[i+1] = exec_name[i]
+            exec_time[i+1] = exec_time[i]
+            exec_name[i] = k
+            exec_time[i] = l
 
+    select_edge1 = exec_name[0]
     global pre_select_edge1
-    if pre_select_edge1 == select_edge1:
-        select_edge1 = min_time_edge1[i][0]
+    if pre_select_edge1 == exec_name[0]:
+        select_edge1 = exec_name[1]
     pre_select_edge1 = select_edge1
 
     # 画像の送信
@@ -94,16 +99,28 @@ def uploads_file():
 
     sql = ("SELECT * FROM depth")
     cursor.execute(sql)
-    min_time_edge2 = cursor.fetchall()
+    task2 = cursor.fetchall()
 
-    select_edge2 = min(
-        min_time_edge2[0][1], min_time_edge2[1][1], min_time_edge2[2][1])
+    exec_time = [[0]*3]
+    exec_name = [[0]*3]
+    for i in range(3):
+        exec_name[i] = task2[i][0]
+        exec_time[i] = task2[i][1]
+    k = 0
+    l = 0
+    for i in range(3):
+        if exec_time[i] > exec_time[i+1]:
+            k = exec_name[i+1]
+            l = exec_time[i+1]
+            exec_name[i+1] = exec_name[i]
+            exec_time[i+1] = exec_time[i]
+            exec_name[i] = k
+            exec_time[i] = l
 
+    select_edge2 = exec_name[0]
     global pre_select_edge2
-    if pre_select_edge2 == select_edge2:
-        select_edge2 = sorted(
-            min_time_edge2[0][1], min_time_edge2[1][1], min_time_edge2[2][1])[2]
-
+    if pre_select_edge2 == exec_name[0]:
+        select_edge2 = exec_name[1]
     pre_select_edge2 = select_edge2
     url = "http://python-depth" + str(select_edge2) + ":8080/depth"
 
