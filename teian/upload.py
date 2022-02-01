@@ -25,6 +25,7 @@ def uploads_file():
     all_time = time.time()
 
     global count
+    count += 1
     print(count)
 
     # opencvでPOSTされたファイルを読み込む
