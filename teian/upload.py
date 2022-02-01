@@ -11,6 +11,8 @@ import time
 
 app = Flask(__name__)
 
+count = 0
+
 
 @app.route('/')
 def index():
@@ -19,6 +21,11 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
+
+    all_time = time.time()
+
+    global count
+    print(count)
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -40,32 +47,15 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor(buffered=True)
-    sql = ("SELECT * FROM teian_detection")
+    sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
     cursor.execute(sql)
-    task1 = cursor.fetchall()
-
-    time_estimate = [0.0, 0.0, 0.0]
-
-    for i in range(3):
-        hold = task1[i][2] - task1[i][3]
-        time_estimate[i] = task1[i][1] * float(hold)
-
-    min = 10000
-
-    for i in range(3):
-        if time_estimate[i] < min:
-            min = time_estimate[i]
-            min_edge1 = i + 1
+    min_time_edge1 = cursor.fetchone()
 
     # 画像の送信
-    url = "http://python-detection" + str(min_edge1) + ":8080/api/predict"
+    url = "http://python-" + min_time_edge1[0] + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
-
-    sql = ("UPDATE teian_detection SET access = access + 1, time = " +
-           str(time_estimate[i]) + "where pod=" + str(min_edge1))
-    cursor.execute(sql)
 
     # 実行時間計測
     detection = time.time()
@@ -79,31 +69,15 @@ def uploads_file():
     detection /= size
 
     # DB更新
-    sql = "UPDATE teian_detection SET fin = fin + 1, time=" + \
-        str(detection) + "WHERE pod=" + str(min_edge1)
+    sql = "UPDATE detection SET time=" + \
+        str(detection) + "WHERE pod='" + min_time_edge1[0] + "'"
     cursor.execute(sql)
 
-    sql = ("SELECT * FROM teian_depth")
+    sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
     cursor.execute(sql)
-    task2 = cursor.fetchall()
+    min_time_edge2 = cursor.fetchone()
 
-    time_estimate = [0.0, 0.0, 0.0]
-
-    for i in range(3):
-        hold = task2[i][2] - task2[i][3]
-        time_estimate[i] = task2[i][1] * float(hold)
-
-    min = 10000
-
-    for i in range(3):
-        if time_estimate[i] < min:
-            min = time_estimate[i]
-            min_edge2 = i + 1
-
-    url = "http://python-depth" + str(min_edge2) + ":8080/depth"
-
-    sql = ("UPDATE teian_depth SET access = access + 1 where pod=" + str(min_edge2))
-    cursor.execute(sql)
+    url = "http://python-" + min_time_edge2[0] + ":8080/depth"
 
     # 実行時間計測
     depth = time.time()
@@ -116,22 +90,24 @@ def uploads_file():
     depth = time.time() - depth
 
     # DB更新
-    sql = "UPDATE teian_depth SET fin = fin + 1, time=" + \
-        str(depth) + "WHERE pod=" + str(min_edge2)
+    sql = "UPDATE depth SET time=" + \
+        str(depth) + "WHERE pod='" + min_time_edge2[0] + "'"
     cursor.execute(sql)
 
     cursor.close()
     conn.commit()
     conn.close()
 
+    all_time = time.time() - all_time
     time_data = {
-        "detection_pod": min_edge1,
+        "detection_pod": min_time_edge1[0],
         "detection_time": detection,
-        "depth_pod": min_edge2,
-        "depth_time": depth
+        "depth_pod": min_time_edge2[0],
+        "depth_time": depth,
+        "exec": all_time
     }
     return jsonify(time_data)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=8080, threaded=True)
+    app.run(debug=True, host='0.0.0.0', port=8080, threaded=False)

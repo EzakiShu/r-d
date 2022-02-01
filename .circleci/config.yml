@@ -41,8 +41,8 @@ jobs:
           #command: docker build -f entry/Dockerfile . --tag $DOCKERHUB_REPO:entry$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
           #command: docker build -f people_detection/Dockerfile . --tag $DOCKERHUB_REPO:people_detection$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
           #command: docker build -f depth-estimate/Dockerfile . --tag $DOCKERHUB_REPO:depth-estimate$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
-          command: docker build -f RoundRobin/Dockerfile . --tag $DOCKERHUB_REPO:RoundRobin$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
-          #command: docker build -f hoge/Dockerfile . --tag $DOCKERHUB_REPO:hoge$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
+          #command: docker build -f RoundRobin/Dockerfile . --tag $DOCKERHUB_REPO:RoundRobin$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
+          command: docker build -f hoge/Dockerfile . --tag $DOCKERHUB_REPO:hoge$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
           #command: docker build -f teian/Dockerfile . --tag $DOCKERHUB_REPO:teian$CIRCLE_BUILD_NUM --no-cache --build-arg BRANCH="$CIRCLE_BRANCH"
 
       - run:
@@ -50,8 +50,8 @@ jobs:
           #command: docker push $DOCKERHUB_REPO:entry$CIRCLE_BUILD_NUM
           #command: docker push $DOCKERHUB_REPO:people_detection$CIRCLE_BUILD_NUM
           #command: docker push $DOCKERHUB_REPO:depth-estimate$CIRCLE_BUILD_NUM
-          command: docker push $DOCKERHUB_REPO:RoundRobin$CIRCLE_BUILD_NUM
-          #command: docker push $DOCKERHUB_REPO:hoge$CIRCLE_BUILD_NUM
+          #command: docker push $DOCKERHUB_REPO:RoundRobin$CIRCLE_BUILD_NUM
+          command: docker push $DOCKERHUB_REPO:hoge$CIRCLE_BUILD_NUM
           #command: docker push $DOCKERHUB_REPO:teian$CIRCLE_BUILD_NUM
   update:
     docker:
