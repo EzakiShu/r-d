@@ -53,8 +53,8 @@ def uploads_file():
     cursor.execute(sql)
     task1 = cursor.fetchall()
 
-    exec_time = [0, 0]
-    exec_name = [0, 0]
+    exec_time = [0, 0, 0]
+    exec_name = [0, 0, 0]
     for i in range(3):
         exec_name[i] = task1[i][0]
         exec_time[i] = task1[i][1]
@@ -101,8 +101,8 @@ def uploads_file():
     cursor.execute(sql)
     task2 = cursor.fetchall()
 
-    exec_time = [0, 0]
-    exec_name = [0, 0]
+    exec_time = [0, 0, 0]
+    exec_name = [0, 0, 0]
     for i in range(3):
         exec_name[i] = task2[i][0]
         exec_time[i] = task2[i][1]
