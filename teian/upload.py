@@ -55,12 +55,12 @@ def uploads_file():
 
     exec_time = [0, 0, 0]
     exec_name = [0, 0, 0]
-    for i in range(2):
+    for i in range(3):
         exec_name[i] = task1[i][0]
         exec_time[i] = task1[i][1]
     k = 0
     l = 0
-    for i in range(2):
+    for i in range(3):
         if exec_time[i] > exec_time[i+1]:
             k = exec_name[i+1]
             l = exec_time[i+1]
@@ -103,12 +103,12 @@ def uploads_file():
 
     exec_time = [0, 0, 0]
     exec_name = [0, 0, 0]
-    for i in range(2):
+    for i in range(3):
         exec_name[i] = task2[i][0]
         exec_time[i] = task2[i][1]
     k = 0
     l = 0
-    for i in range(2):
+    for i in range(3):
         if exec_time[i] > exec_time[i+1]:
             k = exec_name[i+1]
             l = exec_time[i+1]
