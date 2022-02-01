@@ -94,7 +94,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE detection SET time=" + \
-        str(detection) + "WHERE pod=detection'" + str(select_edge1) + "'"
+        str(detection) + "WHERE pod=detection" + str(select_edge1)
     cursor.execute(sql)
 
     sql = ("SELECT * FROM depth")
@@ -136,7 +136,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE depth SET time=" + \
-        str(depth) + "WHERE pod=depth'" + str(select_edge2) + "'"
+        str(depth) + "WHERE pod=depth" + str(select_edge2)
     cursor.execute(sql)
 
     cursor.close()
