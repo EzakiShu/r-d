@@ -15,8 +15,6 @@ app = Flask(__name__)
 
 exec_det_glo = [[1, 0], [2, 0], [3, 0]]
 exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
-pre_select1 = 0
-#pre_select2 = 0
 LOCK = threading.Lock()
 
 
@@ -27,10 +25,7 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
-    global exec_det_glo
-    global exec_dep_glo
-    global pre_select1
-    #global pre_select2
+
     all_time = time.time()
 
     # opencvでPOSTされたファイルを読み込む
@@ -52,6 +47,7 @@ def uploads_file():
     # 配置先決定
     # k = 0
     with LOCK:
+        global exec_det_glo
         exec_det = exec_det_glo
 
         # for i in range(2):
@@ -61,15 +57,6 @@ def uploads_file():
         #         exec_det[i] = k
     exec_det = sorted(exec_det, key=lambda x: x[1])
     select_task1 = exec_det[0][0]
-
-    with LOCK:
-        pre_task1 = pre_select1
-
-    if pre_task1 == select_task1:
-        select_task1 = exec_det[1][0]
-
-    with LOCK:
-        pre_select1 = select_task1
 
     # 画像の送信
     url = "http://python-detection" + str(select_task1) + ":8080/api/predict"
@@ -107,6 +94,7 @@ def uploads_file():
 
     # 配置先決定
     with LOCK:
+        global exec_dep_glo
         exec_dep = exec_dep_glo
     # k = 0
     #    for i in range(2):
@@ -117,15 +105,6 @@ def uploads_file():
 
     exec_dep = sorted(exec_dep, key=lambda x: x[1])
     select_task2 = exec_dep[0][0]
-
-    with LOCK:
-        pre_task2 = pre_select1
-
-    if pre_task2 == select_task2:
-        select_task2 = exec_dep[1][0]
-
-    with LOCK:
-        pre_select1 = select_task2
 
     url = "http://python-depth" + str(select_task2) + ":8080/depth"
 
@@ -151,7 +130,6 @@ def uploads_file():
     exec_write2 = time.time()
     with LOCK:
         exec_dep_glo[select_task2 - 1][1] = depth_size
-
     exec_write2 = time.time() - exec_write2
 
     all_time = time.time() - all_time
