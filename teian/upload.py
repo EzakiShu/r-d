@@ -1,19 +1,23 @@
+from asyncio import tasks
 import requests
 import cv2
 import logging
 import numpy as np
-import mysql.connector
+# import mysql.connector
 from flask import Flask, request, jsonify
 from flask import render_template
 from werkzeug.utils import secure_filename
 from converter import i2b, b2i
 import time
+import threading
 
 app = Flask(__name__)
 
-count = 0
-pre_select_edge1 = 0
-pre_select_edge2 = 0
+exec_det_glo = [[1, 0], [2, 0], [3, 0]]
+exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
+pre_select1 = 0
+pre_select2 = 0
+LOCK = threading.Lock()
 
 
 @app.route('/')
@@ -23,11 +27,11 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
-
+    global exec_det_glo
+    global exec_dep_glo
+    global pre_select1
+    global pre_select2
     all_time = time.time()
-
-    global count
-    count += 1
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -37,121 +41,132 @@ def uploads_file():
     # バイナリに変換
     img_b = i2b(img)
 
+    load = time.time() - all_time
+
     # データサイズ
     size = len(img_b) / 1000000
 
-    # database接続
-    conn = mysql.connector.connect(
-        host='mysql-server',
-        port='3306',
-        user='devuser',
-        password='devuser',
-        database='time'
-    )
-    cursor = conn.cursor(buffered=True)
-    sql = ("SELECT * FROM detection")
-    cursor.execute(sql)
-    task1 = cursor.fetchall()
+    # 配置計算時間
+    task_time1 = time.time()
 
-    exec_time = [0, 0, 0]
-    exec_name = [1, 2, 3]
-    for i in range(3):
-        exec_time[i] = task1[i][1]
-    k = 0
-    l = 0
-    for i in range(2):
-        if exec_time[i] > exec_time[i+1]:
-            k = exec_name[i+1]
-            l = exec_time[i+1]
-            exec_name[i+1] = exec_name[i]
-            exec_time[i+1] = exec_time[i]
-            exec_name[i] = k
-            exec_time[i] = l
+    # 配置先決定
+    # k = 0
+    with LOCK:
+        exec_det = exec_det_glo
 
-    select_edge1 = exec_name[0]
-    global pre_select_edge1
-    if pre_select_edge1 == exec_name[0]:
-        select_edge1 = exec_name[1]
-    pre_select_edge1 = select_edge1
+        # for i in range(2):
+        #     if exec_det[i][1] > exec_det[i+1][1]:
+        #         k = exec_det[i+1]
+        #         exec_det[i+1] = exec_det[i]
+        #         exec_det[i] = k
+    exec_det = sorted(exec_det, key=lambda x: x[1])
+    select_task1 = exec_det[0][0]
+
+    with LOCK:
+        pre_task1 = pre_select1
+
+    if pre_task1 == select_task1:
+        select_task1 = exec_det[1][0]
 
     # 画像の送信
-    url = "http://python-detection" + str(select_edge1) + ":8080/api/predict"
+    url = "http://python-detection" + str(select_task1) + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
+
+    # 配置計算時間
+    task_time1 = time.time() - task_time1
 
     # 実行時間計測
     detection = time.time()
 
     # 検知リクエスト
     response = requests.post(url, data=img_data)
-    detection_img = response.json()['data1']
+    # detection_img = response.json()['data1']
 
     # 実行時間計測
     detection = time.time() - detection
-    detection /= size
+    detection_size = detection/size
 
-    # DB更新
-    sql = "UPDATE detection SET time=" + \
-        str(detection) + "WHERE pod=" + str(select_edge1)
-    cursor.execute(sql)
+    exec_write1 = time.time()
 
-    sql = ("SELECT * FROM depth")
-    cursor.execute(sql)
-    task2 = cursor.fetchall()
+    # 実行時間更新
+    with LOCK:
+        exec_det_glo[select_task1 - 1][1] = detection_size
+        pre_select1 = pre_task1
 
-    exec_time = [0, 0, 0]
-    exec_name = [1, 2, 3]
-    for i in range(3):
-        exec_time[i] = task2[i][1]
-    k = 0
-    l = 0
-    for i in range(2):
-        if exec_time[i] > exec_time[i+1]:
-            k = exec_name[i+1]
-            l = exec_time[i+1]
-            exec_name[i+1] = exec_name[i]
-            exec_time[i+1] = exec_time[i]
-            exec_name[i] = k
-            exec_time[i] = l
+    exec_write1 = time.time() - exec_write1
+    # for i in range(3):
+    #     if exec_det[i][0] == select_task1:
+    #         exec_det[i][1] = detection
 
-    select_edge2 = exec_name[0]
-    global pre_select_edge2
-    if pre_select_edge2 == exec_name[0]:
-        select_edge2 = exec_name[1]
-    pre_select_edge2 = select_edge2
-    url = "http://python-depth" + str(select_edge2) + ":8080/depth"
+    # 配置計算時間
+    task_time2 = time.time()
+
+    # 配置先決定
+    with LOCK:
+        exec_dep = exec_dep_glo
+    # k = 0
+    #    for i in range(2):
+    #         if exec_dep[i][1] > exec_dep[i+1][1]:
+    #             k = exec_dep[i+1]
+    #             exec_dep[i+1] = exec_dep[i]
+    #             exec_dep[i] = k
+
+    exec_dep = sorted(exec_dep, key=lambda x: x[1])
+    select_task2 = exec_dep[0][0]
+
+    with LOCK:
+        pre_task2 = pre_select2
+
+    if pre_task2 == select_task2:
+        select_task2 = exec_dep[1][0]
+
+    url = "http://python-depth" + str(select_task2) + ":8080/depth"
+
+    task_time2 = time.time() - task_time2
 
     # 実行時間計測
     depth = time.time()
 
     # 距離推定リクエスト
     response = requests.post(url, data=img_data)
-    depth_img = response.json()['data2']
+    # depth_img = response.json()['data2']
 
     # 実行時間計測
     depth = time.time() - depth
+    depth_size = depth / size
 
-    # DB更新
-    sql = "UPDATE depth SET time=" + \
-        str(depth) + "WHERE pod=" + str(select_edge2)
-    cursor.execute(sql)
+    # 実行時間更新
+    # with LOCK:
+    # for i in range(3):
+    #     if exec_dep[i][0] == select_task2:
+    #         exec_dep[i][1] = depth
 
-    cursor.close()
-    conn.commit()
-    conn.close()
+    exec_write2 = time.time()
+    with LOCK:
+        exec_dep_glo[select_task2 - 1][1] = depth_size
+        pre_select2 = select_task2
+
+    exec_write2 = time.time() - exec_write2
 
     all_time = time.time() - all_time
     time_data = {
-        "detection_pod": select_edge1,
+        "detection_pod": select_task1,
         "detection_time": detection,
-        "depth_pod": select_edge2,
+        "detection_time_size": detection_size,
+        "detection_calc_time": task_time1,
+        "detection_update_time": exec_write1,
+        "depth_pod": select_task2,
         "depth_time": depth,
+        "depth_time_size": depth_size,
+        "depth_calc_time": task_time2,
+        "depth_update_time": exec_write2,
         "exec": all_time,
-        "count": count
+        "load_time": load
     }
     return jsonify(time_data)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=8080, threaded=False)
+    app.run(debug=True, host='0.0.0.0', port=8080, threaded=True)
