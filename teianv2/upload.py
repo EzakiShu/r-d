@@ -76,13 +76,13 @@ def uploads_file():
 
     # 実行時間計測
     detection = time.time() - detection
-    detection /= size
+    detection_size = detection/size
 
     exec_write1 = time.time()
 
     # 実行時間更新
     with LOCK:
-        exec_det_glo[select_task1 - 1][1] = detection
+        exec_det_glo[select_task1 - 1][1] = detection_size
 
     exec_write1 = time.time() - exec_write1
     # for i in range(3):
@@ -119,7 +119,7 @@ def uploads_file():
 
     # 実行時間計測
     depth = time.time() - depth
-    depth /= size
+    depth_size = depth / size
 
     # 実行時間更新
     # with LOCK:
@@ -129,17 +129,19 @@ def uploads_file():
 
     exec_write2 = time.time()
     with LOCK:
-        exec_dep_glo[select_task2 - 1][1] = depth
+        exec_dep_glo[select_task2 - 1][1] = depth_size
     exec_write2 = time.time() - exec_write2
 
     all_time = time.time() - all_time
     time_data = {
         "detection_pod": select_task1,
         "detection_time": detection,
+        "detection_time_size": detection_size,
         "detection_calc_time": task_time1,
         "detection_update_time": exec_write1,
         "depth_pod": select_task2,
         "depth_time": depth,
+        "depth_time_size": depth_size,
         "depth_calc_time": task_time2,
         "depth_update_time": exec_write2,
         "exec": all_time,
