@@ -93,7 +93,7 @@ def uploads_file():
     # 実行時間更新
     with LOCK:
         exec_det_glo[select_task1 - 1][1] = detection_size
-        pre_select1 = pre_task1
+        pre_select1 = select_task1
 
     exec_write1 = time.time() - exec_write1
     # for i in range(3):
