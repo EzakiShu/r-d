@@ -99,7 +99,7 @@ def uploads_file():
     with LOCK:
         for i in range(3):
             if exec_dep[i][0] == select_task2:
-                exec_dep[i][0] = depth
+                exec_dep[i][1] = depth
 
     all_time = time.time() - all_time
     time_data = {
