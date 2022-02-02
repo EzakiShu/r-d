@@ -66,7 +66,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE detection SET time=" + \
-        str(detection) + "WHERE pod=" + min_time_edge1[0]
+        str(detection) + "WHERE pod=" + str(min_time_edge1[0])
     cursor.execute(sql)
 
     sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
@@ -87,7 +87,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE depth SET time=" + \
-        str(depth) + "WHERE pod=" + min_time_edge2[0]
+        str(depth) + "WHERE pod=" + str(min_time_edge2[0])
     cursor.execute(sql)
 
     cursor.close()
