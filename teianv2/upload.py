@@ -3,7 +3,7 @@ import requests
 import cv2
 import logging
 import numpy as np
-#import mysql.connector
+# import mysql.connector
 from flask import Flask, request, jsonify
 from flask import render_template
 from werkzeug.utils import secure_filename
@@ -13,8 +13,8 @@ import threading
 
 app = Flask(__name__)
 
-exec_det = [[1, 0], [2, 0], [3, 0]]
-exec_dep = [[1, 0], [2, 0], [3, 0]]
+exec_det_glo = [[1, 0], [2, 0], [3, 0]]
+exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
 LOCK = threading.Lock()
 
 
@@ -36,6 +36,8 @@ def uploads_file():
     # バイナリに変換
     img_b = i2b(img)
 
+    load = time.time() - all_time
+
     # データサイズ
     size = len(img_b) / 1000000
 
@@ -43,15 +45,18 @@ def uploads_file():
     task_time1 = time.time()
 
     # 配置先決定
-    global exec_det
-    k = 0
+    # k = 0
     with LOCK:
-        for i in range(2):
-            if exec_det[i][1] > exec_det[i+1][1]:
-                k = exec_det[i+1]
-                exec_det[i+1] = exec_det[i]
-                exec_det[i] = k
-        select_task1 = exec_det[0][0]
+        global exec_det_glo
+        exec_det = exec_det_glo
+
+        # for i in range(2):
+        #     if exec_det[i][1] > exec_det[i+1][1]:
+        #         k = exec_det[i+1]
+        #         exec_det[i+1] = exec_det[i]
+        #         exec_det[i] = k
+    exec_det = sorted(exec_det, key=lambda x: x[1])
+    select_task1 = exec_det[0][0]
 
     # 画像の送信
     url = "http://python-detection" + str(select_task1) + ":8080/api/predict"
@@ -67,7 +72,7 @@ def uploads_file():
 
     # 検知リクエスト
     response = requests.post(url, data=img_data)
-    #detection_img = response.json()['data1']
+    # detection_img = response.json()['data1']
 
     # 実行時間計測
     detection = time.time() - detection
@@ -75,23 +80,28 @@ def uploads_file():
 
     # 実行時間更新
     with LOCK:
-        for i in range(3):
-            if exec_det[i][0] == select_task1:
-                exec_det[i][1] = detection
+        global exec_det_glo
+        exec_det_glo[select_task1 - 1][1] = detection
+        # for i in range(3):
+        #     if exec_det[i][0] == select_task1:
+        #         exec_det[i][1] = detection
 
      # 配置計算時間
     task_time2 = time.time()
 
     # 配置先決定
-    global exec_dep
-    k = 0
     with LOCK:
-        for i in range(2):
-            if exec_dep[i][1] > exec_dep[i+1][1]:
-                k = exec_dep[i+1]
-                exec_dep[i+1] = exec_dep[i]
-                exec_dep[i] = k
-        select_task2 = exec_dep[0][0]
+        global exec_dep_glo
+        exec_dep = exec_dep_glo
+    # k = 0
+    #    for i in range(2):
+    #         if exec_dep[i][1] > exec_dep[i+1][1]:
+    #             k = exec_dep[i+1]
+    #             exec_dep[i+1] = exec_dep[i]
+    #             exec_dep[i] = k
+
+    exec_dep = sorted(exec_dep, key=lambda x: x[1])
+    select_task2 = exec_dep[0][0]
 
     url = "http://python-depth" + str(select_task2) + ":8080/depth"
 
@@ -109,10 +119,14 @@ def uploads_file():
     depth /= size
 
     # 実行時間更新
+    # with LOCK:
+    # for i in range(3):
+    #     if exec_dep[i][0] == select_task2:
+    #         exec_dep[i][1] = depth
+
     with LOCK:
-        for i in range(3):
-            if exec_dep[i][0] == select_task2:
-                exec_dep[i][1] = depth
+        global exec_dep_glo
+        exec_det_glo[select_task2 - 1][1] = depth
 
     all_time = time.time() - all_time
     time_data = {
@@ -123,6 +137,7 @@ def uploads_file():
         "depth_time": depth,
         "depth_calc_time": task_time2,
         "exec": all_time,
+        "load_time": load
     }
     return jsonify(time_data)
 
