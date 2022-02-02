@@ -11,6 +11,10 @@ import time
 
 app = Flask(__name__)
 
+count = 0
+pre_select_edge1 = 0
+pre_select_edge2 = 0
+
 
 @app.route('/')
 def index():
@@ -21,6 +25,9 @@ def index():
 def uploads_file():
 
     all_time = time.time()
+
+    global count
+    count += 1
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -42,13 +49,33 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor(buffered=True)
-    sql = ("SELECT pod FROM detection WHERE time=(SELECT MIN(time) FROM detection)")
+    sql = ("SELECT * FROM detection")
     cursor.execute(sql)
-    min_time_edge1 = cursor.fetchone()
+    task1 = cursor.fetchall()
+
+    exec_time = [0, 0, 0]
+    exec_name = [1, 2, 3]
+    for i in range(3):
+        exec_time[i] = task1[i][1]
+    k = 0
+    l = 0
+    for i in range(2):
+        if exec_time[i] > exec_time[i+1]:
+            k = exec_name[i+1]
+            l = exec_time[i+1]
+            exec_name[i+1] = exec_name[i]
+            exec_time[i+1] = exec_time[i]
+            exec_name[i] = k
+            exec_time[i] = l
+
+    select_edge1 = exec_name[0]
+    global pre_select_edge1
+    if pre_select_edge1 == exec_name[0]:
+        select_edge1 = exec_name[1]
+    pre_select_edge1 = select_edge1
 
     # 画像の送信
-    url = "http://python-detection" + \
-        str(min_time_edge1[0]) + ":8080/api/predict"
+    url = "http://python-detection" + str(select_edge1) + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
@@ -66,14 +93,34 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE detection SET time=" + \
-        str(detection) + "WHERE pod=" + str(min_time_edge1[0])
+        str(detection) + "WHERE pod=" + str(select_edge1)
     cursor.execute(sql)
 
-    sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
+    sql = ("SELECT * FROM depth")
     cursor.execute(sql)
-    min_time_edge2 = cursor.fetchone()
+    task2 = cursor.fetchall()
 
-    url = "http://python-depth" + str(min_time_edge2[0]) + ":8080/depth"
+    exec_time = [0, 0, 0]
+    exec_name = [1, 2, 3]
+    for i in range(3):
+        exec_time[i] = task2[i][1]
+    k = 0
+    l = 0
+    for i in range(2):
+        if exec_time[i] > exec_time[i+1]:
+            k = exec_name[i+1]
+            l = exec_time[i+1]
+            exec_name[i+1] = exec_name[i]
+            exec_time[i+1] = exec_time[i]
+            exec_name[i] = k
+            exec_time[i] = l
+
+    select_edge2 = exec_name[0]
+    global pre_select_edge2
+    if pre_select_edge2 == exec_name[0]:
+        select_edge2 = exec_name[1]
+    pre_select_edge2 = select_edge2
+    url = "http://python-depth" + str(select_edge2) + ":8080/depth"
 
     # 実行時間計測
     depth = time.time()
@@ -87,7 +134,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE depth SET time=" + \
-        str(depth) + "WHERE pod=" + str(min_time_edge2[0])
+        str(depth) + "WHERE pod=" + str(select_edge2)
     cursor.execute(sql)
 
     cursor.close()
@@ -96,11 +143,12 @@ def uploads_file():
 
     all_time = time.time() - all_time
     time_data = {
-        "detection_pod": min_time_edge1[0],
+        "detection_pod": select_edge1,
         "detection_time": detection,
-        "depth_pod": min_time_edge2[0],
+        "depth_pod": select_edge2,
         "depth_time": depth,
-        "exec": all_time
+        "exec": all_time,
+        "count": count
     }
     return jsonify(time_data)
 

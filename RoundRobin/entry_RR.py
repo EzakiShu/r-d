@@ -3,7 +3,7 @@ import cv2
 import logging
 import numpy as np
 import mysql.connector
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask import render_template
 from werkzeug.utils import secure_filename
 from converter import i2b, b2i
@@ -20,7 +20,7 @@ def index():
 @app.route('/', methods=['POST'])
 def uploads_file():
     # 実行時間計測
-    detection = time.time()
+    all_time = time.time()
 
     # opencvでPOSTされたファイルを読み込む
     file_data = request.files['file'].read()
@@ -38,9 +38,21 @@ def uploads_file():
         database='time'
     )
     cursor = conn.cursor()
+    sql = ("SELECT GET_LOCK('lock'),5")
+    cursor.execute(sql)
     sql = ("SELECT next FROM RoundRobin")
     cursor.execute(sql)
     next_edge = cursor.fetchone()
+
+    # next pod
+    if next_edge[0] < 3:
+        next = next_edge[0] + 1
+    else:
+        next = 1
+    sql = "UPDATE RoundRobin SET next = " + str(next)
+    cursor.execute(sql)
+    sql = ("SELECT COALESCE(RELEASE_LOCK'lock'), 5")
+    cursor.execute(sql)
 
     # 画像の送信
     url = "http://python-detection" + str(next_edge[0]) + ":8080/api/predict"
@@ -48,6 +60,7 @@ def uploads_file():
         "data": img_b
     }
 
+    detection = time.time()
     # 検知リクエスト
     response = requests.post(url, data=img_data)
     detection_img = response.json()['data1']
@@ -76,22 +89,21 @@ def uploads_file():
     #     str(depth) + "WHERE pod='" + str(next_edge[0]) + "'"
     # cursor.execute(sql)
 
-    # next pod
-    if next_edge[0] < 6:
-        next = next_edge[0] + 1
-    else:
-        next = 1
-    sql = "UPDATE RoundRobin SET next = " + str(next)
-
-    cursor.execute(sql)
     cursor.close()
     conn.commit()
     conn.close()
 
     img = '<img src="data:image/png;base64,' + detection_img + \
         '"/>' '<img src="data:image/png;base64,' + depth_img + '"/>'
-    return img
+    # return img
+
+    all_time = time.time() - all_time
+    time_data = {
+        "edge": next_edge[0],
+        "exec": all_time
+    }
+    return jsonify(time_data)
 
 
 if __name__ == "__main__":
-    app.run(debug=False, host='0.0.0.0', port=8080, threaded=True)
+    app.run(debug=True, host='0.0.0.0', port=8080, threaded=True)
