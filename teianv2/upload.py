@@ -94,6 +94,7 @@ def uploads_file():
 
     # 実行時間計測
     depth = time.time() - depth
+    depth /= size
 
     # 実行時間更新
     with LOCK:
