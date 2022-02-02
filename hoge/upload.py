@@ -47,7 +47,8 @@ def uploads_file():
     min_time_edge1 = cursor.fetchone()
 
     # 画像の送信
-    url = "http://python-" + min_time_edge1[0] + ":8080/api/predict"
+    url = "http://python-detection" + \
+        str(min_time_edge1[0]) + ":8080/api/predict"
     img_data = {
         "data": img_b
     }
@@ -65,14 +66,14 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE detection SET time=" + \
-        str(detection) + "WHERE pod='" + min_time_edge1[0] + "'"
+        str(detection) + "WHERE pod=" + min_time_edge1[0]
     cursor.execute(sql)
 
     sql = ("SELECT pod FROM depth WHERE time=(SELECT MIN(time) FROM depth)")
     cursor.execute(sql)
     min_time_edge2 = cursor.fetchone()
 
-    url = "http://python-" + min_time_edge2[0] + ":8080/depth"
+    url = "http://python-depth" + str(min_time_edge2[0]) + ":8080/depth"
 
     # 実行時間計測
     depth = time.time()
@@ -86,7 +87,7 @@ def uploads_file():
 
     # DB更新
     sql = "UPDATE depth SET time=" + \
-        str(depth) + "WHERE pod='" + min_time_edge2[0] + "'"
+        str(depth) + "WHERE pod=" + min_time_edge2[0]
     cursor.execute(sql)
 
     cursor.close()
