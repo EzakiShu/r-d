@@ -1,3 +1,4 @@
+from asyncio import tasks
 import requests
 import cv2
 import logging
@@ -38,6 +39,9 @@ def uploads_file():
     # データサイズ
     size = len(img_b) / 1000000
 
+    # 配置計算時間
+    task_time1 = time.time()
+
     # 配置先決定
     global exec_det
     k = 0
@@ -54,6 +58,9 @@ def uploads_file():
     img_data = {
         "data": img_b
     }
+
+    # 配置計算時間
+    task_time1 = time.time() - task_time1
 
     # 実行時間計測
     detection = time.time()
@@ -72,6 +79,9 @@ def uploads_file():
             if exec_det[i][0] == select_task1:
                 exec_det[i][1] = detection
 
+     # 配置計算時間
+    task_time2 = time.time()
+
     # 配置先決定
     global exec_dep
     k = 0
@@ -84,6 +94,8 @@ def uploads_file():
         select_task2 = exec_dep[0][0]
 
     url = "http://python-depth" + str(select_task2) + ":8080/depth"
+
+    task_time2 = time.time() - task_time2
 
     # 実行時間計測
     depth = time.time()
@@ -106,8 +118,10 @@ def uploads_file():
     time_data = {
         "detection_pod": select_task1,
         "detection_time": detection,
+        "detection_calc_time": task_time1,
         "depth_pod": select_task2,
         "depth_time": depth,
+        "depth_calc_time": task_time2,
         "exec": all_time,
     }
     return jsonify(time_data)
