@@ -80,7 +80,6 @@ def uploads_file():
 
     # 実行時間更新
     with LOCK:
-        global exec_det_glo
         exec_det_glo[select_task1 - 1][1] = detection
         # for i in range(3):
         #     if exec_det[i][0] == select_task1:
@@ -125,8 +124,7 @@ def uploads_file():
     #         exec_dep[i][1] = depth
 
     with LOCK:
-        global exec_dep_glo
-        exec_det_glo[select_task2 - 1][1] = depth
+        exec_dep_glo[select_task2 - 1][1] = depth
 
     all_time = time.time() - all_time
     time_data = {
