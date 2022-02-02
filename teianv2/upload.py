@@ -78,14 +78,18 @@ def uploads_file():
     detection = time.time() - detection
     detection /= size
 
+    exec_write1 = time.time()
+
     # 実行時間更新
     with LOCK:
         exec_det_glo[select_task1 - 1][1] = detection
-        # for i in range(3):
-        #     if exec_det[i][0] == select_task1:
-        #         exec_det[i][1] = detection
 
-     # 配置計算時間
+    exec_write1 = time.time() - exec_write1
+    # for i in range(3):
+    #     if exec_det[i][0] == select_task1:
+    #         exec_det[i][1] = detection
+
+    # 配置計算時間
     task_time2 = time.time()
 
     # 配置先決定
@@ -123,17 +127,21 @@ def uploads_file():
     #     if exec_dep[i][0] == select_task2:
     #         exec_dep[i][1] = depth
 
+    exec_write2 = time.time()
     with LOCK:
         exec_dep_glo[select_task2 - 1][1] = depth
+    exec_write2 = time.time() - exec_write2
 
     all_time = time.time() - all_time
     time_data = {
         "detection_pod": select_task1,
         "detection_time": detection,
         "detection_calc_time": task_time1,
+        "detection_update_time": exec_write1,
         "depth_pod": select_task2,
         "depth_time": depth,
         "depth_calc_time": task_time2,
+        "depth_update_time": exec_write2,
         "exec": all_time,
         "load_time": load
     }
