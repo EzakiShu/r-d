@@ -18,7 +18,7 @@ app = Flask(__name__)
 exec_det_glo = [[1, 0], [2, 0], [3, 0]]
 exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
 pre_select1 = 0
-thread = 0
+thread_glo = 0
 #pre_select2 = 0
 
 LOCK = threading.Lock()
@@ -35,7 +35,7 @@ def uploads_file():
     global exec_det_glo
     global exec_dep_glo
     global pre_select1
-    global thread
+    global thread_glo
     #global pre_select2
     all_time = time.time()
 
@@ -58,7 +58,8 @@ def uploads_file():
     # 配置先決定
     # k = 0
     with LOCK:
-        thread += 1
+        thread_glo += 1
+        thread = thread_glo
         exec_det = exec_det_glo
 
         # for i in range(2):
