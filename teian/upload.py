@@ -1,4 +1,5 @@
 from asyncio import tasks
+from sqlite3 import adapt
 import requests
 import cv2
 import logging
@@ -10,6 +11,7 @@ from werkzeug.utils import secure_filename
 from converter import i2b, b2i
 import time
 import threading
+import requests.adapters
 
 app = Flask(__name__)
 
@@ -17,8 +19,9 @@ exec_det_glo = [[1, 0], [2, 0], [3, 0]]
 exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
 pre_select1 = 0
 #pre_select2 = 0
-LOCK = threading.Lock()
 
+LOCK = threading.Lock()
+adapter = requests.adapters.HTTPAdapter(pool_connections=500, pool_maxsize=100)
 
 @app.route('/')
 def index():
