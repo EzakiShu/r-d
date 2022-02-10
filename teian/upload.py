@@ -18,10 +18,12 @@ app = Flask(__name__)
 exec_det_glo = [[1, 0], [2, 0], [3, 0]]
 exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
 pre_select1 = 0
+thread = 0
 #pre_select2 = 0
 
 LOCK = threading.Lock()
 adapter = requests.adapters.HTTPAdapter(pool_connections=500, pool_maxsize=100)
+
 
 @app.route('/')
 def index():
@@ -33,6 +35,7 @@ def uploads_file():
     global exec_det_glo
     global exec_dep_glo
     global pre_select1
+    global thread
     #global pre_select2
     all_time = time.time()
 
@@ -55,6 +58,7 @@ def uploads_file():
     # 配置先決定
     # k = 0
     with LOCK:
+        thread += 1
         exec_det = exec_det_glo
 
         # for i in range(2):
@@ -170,7 +174,8 @@ def uploads_file():
         "depth_calc_time": task_time2,
         "depth_update_time": exec_write2,
         "exec": all_time,
-        "load_time": load
+        "load_time": load,
+        "thread": thread
     }
     return jsonify(time_data)
 

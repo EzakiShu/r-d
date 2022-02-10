@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 exec_det_glo = [[1, 0], [2, 0], [3, 0]]
 exec_dep_glo = [[1, 0], [2, 0], [3, 0]]
+thread = 0
 LOCK = threading.Lock()
 
 
@@ -25,7 +26,7 @@ def index():
 
 @app.route('/', methods=['POST'])
 def uploads_file():
-
+    global thread
     all_time = time.time()
 
     # opencvでPOSTされたファイルを読み込む
@@ -47,6 +48,7 @@ def uploads_file():
     # 配置先決定
     # k = 0
     with LOCK:
+        thread += 1
         global exec_det_glo
         exec_det = exec_det_glo
 
@@ -145,7 +147,8 @@ def uploads_file():
         "depth_calc_time": task_time2,
         "depth_update_time": exec_write2,
         "exec": all_time,
-        "load_time": load
+        "load_time": load,
+        "thread": thread
     }
     return jsonify(time_data)
 
