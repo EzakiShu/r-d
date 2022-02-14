@@ -49,7 +49,7 @@ def predict():
 
         # バイナリに変換
         img_b = i2b(cv_image)
-        exec_time = time.ime() - exec_time
+        exec_time = time.time() - exec_time
 
         # 画像と実行時間の返信
         img_data = {
