@@ -32,6 +32,7 @@ def hello():
 
 @app.route('/api/predict', methods=["POST"])
 def predict():
+    exec_time = time.time()
     global graph
     with graph.as_default():
         # POSTされたファイルをOpenCVに変換
@@ -48,10 +49,12 @@ def predict():
 
         # バイナリに変換
         img_b = i2b(cv_image)
+        exec_time = time.ime() - exec_time
 
         # 画像と実行時間の返信
         img_data = {
-            "data1": img_b
+            "data1": img_b,
+            "detection_exec_time": exec_time
         }
 
         return jsonify(img_data)
