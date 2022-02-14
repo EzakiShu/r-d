@@ -95,9 +95,13 @@ def uploads_file():
     response = requests.post(url, data=img_data)
     # detection_img = response.json()['data1']
 
+    detection_exec_time = response.json()["detection_exec_time"]
+
     # 実行時間計測
     detection = time.time() - detection
     detection_size = detection/size
+
+    transfer = detection - detection_exec_time
 
     exec_write1 = time.time()
 
@@ -176,7 +180,8 @@ def uploads_file():
         "depth_update_time": exec_write2,
         "exec": all_time,
         "load_time": load,
-        "thread": thread
+        "thread": thread,
+        "transfer": transfer
     }
     return jsonify(time_data)
 
