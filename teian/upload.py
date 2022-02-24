@@ -169,7 +169,9 @@ def uploads_file():
         "exec": all_time,
         "load_time": load
     }
-    return jsonify(time_data)
+    img = response.json()['data2']
+    img = '<img src="data:image/png;base64,' + img + '"/>'
+    return img
 
 
 if __name__ == "__main__":
